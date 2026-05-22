@@ -56,6 +56,24 @@
           </fieldset>
 
           <fieldset class="form-row">
+            <legend>Change in weight</legend>
+            <div class="weight-fields">
+              <div>
+                <label for="current-weight">Current weight</label>
+                <input type="number" id="current-weight" name="currentWeight" min="0" step="1" inputmode="numeric" placeholder="How much do you weigh now?" required />
+              </div>
+              <div id="previous-weight-group">
+                <label for="previous-weight">Weight 1 year ago</label>
+                <input type="number" id="previous-weight" name="previousWeightOneYearAgo" min="0" step="1" inputmode="numeric" placeholder="How much did you weigh 1 year ago?" required />
+              </div>
+            </div>
+            <label class="choice" for="no-weight-change">
+              <input type="checkbox" id="no-weight-change" name="noWeightChange" value="Yes" />
+              <span>No change in weight</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
             <legend>Did you have intentional weight loss, for example due to dieting or exercise?</legend>
             <label class="choice" for="intentional-weight-loss-yes">
               <input type="radio" id="intentional-weight-loss-yes" name="intentionalWeightLoss" value="Yes" required />
@@ -192,6 +210,202 @@
               </div>
             </div>
           </div>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you done any gardening?</legend>
+            <label class="choice" for="gardening-yes">
+              <input type="radio" id="gardening-yes" name="gardening" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="gardening-no">
+              <input type="radio" id="gardening-no" name="gardening" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="gardening-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="gardening-times">How many times in the past two weeks?</label>
+              <input type="number" id="gardening-times" name="gardeningTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="gardening-minutes">How many minutes on average per session do you do gardening?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="gardening-minutes-output" for="gardening-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="gardening-minutes" name="gardeningMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="gardening-months">How many months per year do you do gardening?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="gardening-months-output" for="gardening-months">0 months</output>
+              </div>
+              <input type="range" id="gardening-months" name="gardeningMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you done any general exercise, excluding walking?</legend>
+            <label class="choice" for="general-exercise-yes">
+              <input type="radio" id="general-exercise-yes" name="generalExercise" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="general-exercise-no">
+              <input type="radio" id="general-exercise-no" name="generalExercise" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="general-exercise-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="general-exercise-times">How many times in the past two weeks?</label>
+              <input type="number" id="general-exercise-times" name="generalExerciseTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="general-exercise-minutes">How many minutes on average per session do you do general exercise?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="general-exercise-minutes-output" for="general-exercise-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="general-exercise-minutes" name="generalExerciseMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="general-exercise-months">How many months per year do you do general exercise?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="general-exercise-months-output" for="general-exercise-months">0 months</output>
+              </div>
+              <input type="range" id="general-exercise-months" name="generalExerciseMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you mowed a lawn?</legend>
+            <label class="choice" for="lawn-mowing-yes">
+              <input type="radio" id="lawn-mowing-yes" name="lawnMowing" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="lawn-mowing-no">
+              <input type="radio" id="lawn-mowing-no" name="lawnMowing" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="lawn-mowing-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="lawn-mowing-times">How many times in the past two weeks?</label>
+              <input type="number" id="lawn-mowing-times" name="lawnMowingTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="lawn-mowing-minutes">How many minutes on average per session do you mow a lawn?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="lawn-mowing-minutes-output" for="lawn-mowing-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="lawn-mowing-minutes" name="lawnMowingMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="lawn-mowing-months">How many months per year do you mow a lawn?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="lawn-mowing-months-output" for="lawn-mowing-months">0 months</output>
+              </div>
+              <input type="range" id="lawn-mowing-months" name="lawnMowingMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you done any golfing?</legend>
+            <label class="choice" for="golfing-yes">
+              <input type="radio" id="golfing-yes" name="golfing" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="golfing-no">
+              <input type="radio" id="golfing-no" name="golfing" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="golfing-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="golfing-times">How many times in the past two weeks?</label>
+              <input type="number" id="golfing-times" name="golfingTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="golfing-minutes">How many minutes on average per session do you golf?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="golfing-minutes-output" for="golfing-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="golfing-minutes" name="golfingMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="golfing-months">How many months per year do you golf?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="golfing-months-output" for="golfing-months">0 months</output>
+              </div>
+              <input type="range" id="golfing-months" name="golfingMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row">
+            <legend>Have you had any recent pain or acute flare-up in your dominant wrist or hand from conditions like arthritis, tendonitis, or carpal tunnel syndrome?</legend>
+            <label class="choice" for="dominant-wrist-hand-pain-yes">
+              <input type="radio" id="dominant-wrist-hand-pain-yes" name="dominantWristHandPain" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="dominant-wrist-hand-pain-no">
+              <input type="radio" id="dominant-wrist-hand-pain-no" name="dominantWristHandPain" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>Have you had any surgery on your dominant hand or arm during the last 3 months?</legend>
+            <label class="choice" for="dominant-hand-arm-surgery-yes">
+              <input type="radio" id="dominant-hand-arm-surgery-yes" name="dominantHandArmSurgeryLastThreeMonths" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="dominant-hand-arm-surgery-no">
+              <input type="radio" id="dominant-hand-arm-surgery-no" name="dominantHandArmSurgeryLastThreeMonths" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
 
           <!-- Future fields can be added here. Example: ethnicity, comorbidities, etc. -->
 

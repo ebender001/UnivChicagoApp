@@ -107,6 +107,38 @@
       minutesOutputId: 'chores-minutes-output',
       monthsRangeId: 'chores-months',
       monthsOutputId: 'chores-months-output'
+    },
+    {
+      choiceName: 'gardening',
+      followUpId: 'gardening-follow-up',
+      minutesRangeId: 'gardening-minutes',
+      minutesOutputId: 'gardening-minutes-output',
+      monthsRangeId: 'gardening-months',
+      monthsOutputId: 'gardening-months-output'
+    },
+    {
+      choiceName: 'generalExercise',
+      followUpId: 'general-exercise-follow-up',
+      minutesRangeId: 'general-exercise-minutes',
+      minutesOutputId: 'general-exercise-minutes-output',
+      monthsRangeId: 'general-exercise-months',
+      monthsOutputId: 'general-exercise-months-output'
+    },
+    {
+      choiceName: 'lawnMowing',
+      followUpId: 'lawn-mowing-follow-up',
+      minutesRangeId: 'lawn-mowing-minutes',
+      minutesOutputId: 'lawn-mowing-minutes-output',
+      monthsRangeId: 'lawn-mowing-months',
+      monthsOutputId: 'lawn-mowing-months-output'
+    },
+    {
+      choiceName: 'golfing',
+      followUpId: 'golfing-follow-up',
+      minutesRangeId: 'golfing-minutes',
+      minutesOutputId: 'golfing-minutes-output',
+      monthsRangeId: 'golfing-months',
+      monthsOutputId: 'golfing-months-output'
     }
   ];
 
@@ -123,14 +155,40 @@
     });
   }
 
+  function syncWeightChange(){
+    var noChange = document.getElementById('no-weight-change');
+    var previousWeightGroup = document.getElementById('previous-weight-group');
+    var previousWeight = document.getElementById('previous-weight');
+    if(!noChange || !previousWeightGroup || !previousWeight) return;
+
+    var hidePreviousWeight = noChange.checked;
+    previousWeightGroup.hidden = hidePreviousWeight;
+    previousWeight.disabled = hidePreviousWeight;
+    previousWeight.required = !hidePreviousWeight;
+
+    if(hidePreviousWeight){
+      previousWeight.value = '';
+    }
+  }
+
+  function setupWeightChange(){
+    var noChange = document.getElementById('no-weight-change');
+    if(!noChange) return;
+
+    noChange.addEventListener('change', syncWeightChange);
+    syncWeightChange();
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.getElementById('survey-form');
     if(!form) return;
 
+    setupWeightChange();
     setupActivityFollowUps();
 
     form.addEventListener('reset', function(){
       window.setTimeout(function(){
+        syncWeightChange();
         resetActivityFollowUps();
       }, 0);
     });
