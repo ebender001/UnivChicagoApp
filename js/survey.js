@@ -210,6 +210,8 @@
 
       showSuccess('Survey saved locally (placeholder). See console for payload.');
 
+      window.location.href = 'enrollee-registration.html';
+
       // Future: show validation errors, send to server, handle auth, show loading state
     });
   });

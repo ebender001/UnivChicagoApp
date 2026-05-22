@@ -92,6 +92,7 @@ input:focus-visible{
 .weight-fields{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:1rem; }
 .height-fields > div,
 .weight-fields > div{ display:flex; flex-direction:column; }
+.input-action-row{ display:grid; grid-template-columns: minmax(0, 1fr) auto; gap:0.75rem; align-items:end; }
 .follow-up{ display:grid; gap:1.25rem; padding:1rem; border-left:6px solid var(--accent); background:#fafafa; border-radius:var(--radius); }
 .follow-up[hidden]{ display:none; }
 .range-value{
@@ -157,6 +158,67 @@ input:focus-visible{
 .form-actions{ display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.5rem; }
 .success{ margin-top:1rem; padding:0.85rem; background:#e8f5ed; border:2px solid #8cc59d; border-radius:6px; color:#074f22; font-weight:700; }
 
+/* Registration page */
+.registration-page .card{ max-width:640px; }
+.registration-page .survey-form{ gap:1rem; max-width:520px; }
+.registration-page .form-row{ gap:0.45rem; }
+.registration-page .form-row label{ font-size:0.95rem; }
+.registration-page .form-row input{ min-height:44px; padding:0.5rem 0.65rem; font-size:1rem; }
+.registration-page .btn{ min-height:44px; padding:0.55rem 0.85rem; font-size:0.95rem; }
+.registration-page .choice{ min-height:40px; padding:0.45rem 0.6rem; gap:0.5rem; }
+.registration-page .choice input{ width:1rem; height:1rem; }
+.registration-page .choice span{ font-size:0.95rem; }
+.registration-page .compact-choice-group{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.registration-page .compact-choice-group legend{ grid-column:1 / -1; }
+.registration-follow-up{ display:grid; gap:1rem; padding:0.75rem; border-left:4px solid var(--accent); background:#fafafa; border-radius:var(--radius); }
+.registration-follow-up[hidden]{ display:none; }
+.registration-follow-up .form-row{ position:relative; }
+.label-action-row{ display:flex; align-items:center; justify-content:space-between; gap:0.75rem; }
+.registration-page .help-btn{
+  min-height:34px;
+  padding:0.35rem 0.65rem;
+  border-color:var(--accent);
+  color:var(--accent);
+  background:#fff;
+  font-size:0.9rem;
+}
+.registration-page .help-btn:hover,
+.registration-page .help-btn:focus{ background:rgba(128,0,0,0.06); color:var(--accent-dark); border-color:var(--accent-dark); }
+.help-popover{
+  display:grid;
+  gap:0.65rem;
+  position:fixed;
+  top:5.5rem;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:30;
+  max-width:720px;
+  max-height:calc(100vh - 7rem);
+  overflow:auto;
+  width:min(720px, calc(100vw - 2.5rem));
+  padding:0.9rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:0 6px 18px rgba(12,12,12,0.12);
+}
+.help-popover[hidden]{ display:none; }
+.help-popover h2{ margin:0.2rem 0 0; color:var(--accent); font-size:1rem; }
+.help-popover ol{ margin:0; padding-left:1.4rem; }
+.help-popover li{ margin:0.25rem 0; }
+.help-popover p{ margin:0; }
+.help-close{ justify-self:end; border:0; background:transparent; color:var(--accent); cursor:pointer; font-weight:800; }
+.timer-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:0.75rem; }
+.timer-card{ display:grid; gap:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:var(--radius); background:#fff; }
+.timer-card h3{ margin:0; color:var(--accent); font-size:1rem; }
+.timer-display{ font-variant-numeric:tabular-nums; font-weight:800; font-size:1.35rem; }
+.registration-page .timer-button{ width:max-content; min-width:90px; }
+.registration-page .timer-button.timer-start{ border-color:#16803a; color:#16803a; background:#fff; }
+.registration-page .timer-button.timer-stop{ border-color:#b42318; color:#b42318; background:#fff; }
+.registration-page .timer-button.timer-reset{ border-color:#d4a800; color:#d4a800; background:#fff; }
+.three-field-row{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:0.75rem; }
+.field-note{ margin:0.25rem 0 0; color:var(--muted); font-size:0.95rem; font-weight:700; }
+
 /* Footer */
 .site-footer{ margin-top:2rem; padding:1rem 0; color:var(--muted); font-size:1rem; }
 
@@ -172,6 +234,10 @@ input:focus-visible{
   .cards-grid{ grid-template-columns: 1fr; }
   .height-fields,
   .weight-fields{ grid-template-columns: 1fr; }
+  .input-action-row{ grid-template-columns: 1fr; }
+  .registration-page .compact-choice-group{ grid-template-columns: 1fr; }
+  .timer-grid{ grid-template-columns: 1fr; }
+  .three-field-row{ grid-template-columns: 1fr; }
   .container{ padding:1rem; }
   .card{ padding:1rem; }
   .page-title{ font-size:1.65rem; }

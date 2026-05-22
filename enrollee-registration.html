@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Enrollee Registration</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="registration-page">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">BeFitMe</a>
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="index.html" class="nav-link">Dashboard</a>
+          <a href="survey.html" class="nav-link">Survey</a>
+          <a href="enrollee-registration.html" class="nav-link active">Registration</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="container">
+      <section class="card">
+        <h1 class="page-title">BeFitMe Enrollee Registration</h1>
+        <p class="lead">Enter an enrollee number or generate one automatically.</p>
+
+        <form class="survey-form">
+          <div class="form-row">
+            <label for="enrollee-number">Enrollee Number</label>
+            <div class="input-action-row">
+              <input type="text" id="enrollee-number" name="enrolleeNumber" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="Enrollee Number" />
+              <button type="button" id="generate-enrollee-number" class="btn primary">Generate</button>
+            </div>
+            <p class="field-note">After generating a number, don't forget to register the MRN on Red Cap</p>
+          </div>
+
+          <fieldset class="form-row compact-choice-group">
+            <legend>Is patient able to complete the grip test?</legend>
+            <label class="choice" for="grip-test-yes">
+              <input type="radio" id="grip-test-yes" name="canCompleteGripTest" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="grip-test-no">
+              <input type="radio" id="grip-test-no" name="canCompleteGripTest" value="No" checked />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="grip-test-follow-up" class="registration-follow-up" hidden>
+            <div class="form-row">
+              <div class="label-action-row">
+                <label>Dominant hand best of 3 trials.</label>
+                <button type="button" id="grip-test-help" class="btn help-btn" aria-expanded="false" aria-controls="grip-test-help-popover">Help</button>
+              </div>
+              <div id="grip-test-help-popover" class="help-popover" hidden>
+                <button type="button" id="close-grip-test-help" class="help-close" aria-label="Close grip test help">Close</button>
+                <h2>Grip Help</h2>
+                <h2>Set up</h2>
+                <ol>
+                  <li>Set dynamometer handle to notch second closest to the unit.</li>
+                  <li>Digital devices: Turn on device. Press RESET and then TEST on the dynamometer before each trial. Manual devices: Ensure needles are at 0 kg.</li>
+                </ol>
+
+                <h2>Instructions</h2>
+                <ol>
+                  <li>Have patient sit down in chair so feet are resting on floor or wheelchair foot plate, knees at 90 degree angle.</li>
+                  <li>Support dynamometer for patient during testing, ensure their elbow is bent to 90 degrees and arm next to but not touching their body.</li>
+                  <li>Administrator: “We will use this machine to measure how strong your dominant hand is. The handle won’t move, but the machine will show how hard you squeezed. Do you have any questions?”</li>
+                  <li>Administration: “When I say ‘squeeze,’ I want you to squeeze the handle as hard as you can. Ready? 3, 2, 1, squeeze. Harder, harder!”</li>
+                  <li>Wait 3-4 seconds, then say “stop.”</li>
+                  <li>Record result to nearest 10th of a kg (##.#).</li>
+                  <li>Repeat 3 total times.</li>
+                </ol>
+
+                <p>
+                  If questions, watch the following video:
+                  <a href="https://www.youtube.com/watch?v=Ny0nsWHBCss&list=PL51Avx1s9tVuTu0VIJXUM7HDN2ziqHGJb&index=16" target="_blank" rel="noreferrer">Grip test video</a>
+                </p>
+              </div>
+              <div class="three-field-row">
+                <input type="text" id="hand-grip-1" name="handGrip1" placeholder="Hand Grip 1" />
+                <input type="text" id="hand-grip-2" name="handGrip2" placeholder="Hand Grip 2" />
+                <input type="text" id="hand-grip-3" name="handGrip3" placeholder="Hand Grip 3" />
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row compact-choice-group">
+            <legend>Is patient able to complete the gait test?</legend>
+            <label class="choice" for="gait-test-yes">
+              <input type="radio" id="gait-test-yes" name="canCompleteGaitTest" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="gait-test-no">
+              <input type="radio" id="gait-test-no" name="canCompleteGaitTest" value="No" checked />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="gait-test-follow-up" class="registration-follow-up" hidden>
+            <div class="form-row">
+              <div class="label-action-row">
+                <label>Gait speed test &gt;0.8 m/s. The time it takes for the patient to walk 4 meters.</label>
+                <button type="button" id="gait-test-help" class="btn help-btn" aria-expanded="false" aria-controls="gait-test-help-popover">Help</button>
+              </div>
+              <div id="gait-test-help-popover" class="help-popover" hidden>
+                <button type="button" id="close-gait-test-help" class="help-close" aria-label="Close gait test help">Close</button>
+                <h2>Gait Help</h2>
+                <h2>Set up</h2>
+                <ol>
+                  <li>Tape the start line, 4-meter and 5-meter distances in a flat, open hall.</li>
+                </ol>
+
+                <h2>Instructions</h2>
+                <ol>
+                  <li>Ensure patient not bare foot or wearing high-healed or open-backed shoes, sandals or flip-flops.</li>
+                  <li>Walking devices like canes or walkers can be used. Patient must not be assisted by another person.</li>
+                  <li>Administrator: “I want you to walk to the other end of the course at your usual speed, just like if you were walking down the street to go to the store. Let me show you what I want you to do. Put both your feet together behind this line (point to the starting line). Walk all the way past the line (5-meters) on the other end before you stop.”</li>
+                  <li>Demonstrate walk.</li>
+                  <li>Ask patient to start with feet behind but touching the start line.</li>
+                  <li>Administrator: “When I want you to start, I will say: 3, 2, 1, go. Do you have any questions?”</li>
+                  <li>Administrator: “Ready? 3, 2, 1, go.”</li>
+                  <li>Start timer when patient’s first foot steps over (first footfall) the start line (static start).</li>
+                  <li>Stop the timer when patient’s first foot completely crosses 4-meter line (dynamic stop).</li>
+                  <li>Record time to nearest 10th of a second (##.#).</li>
+                </ol>
+
+                <p>
+                  If questions, watch the following video:
+                  <a href="https://www.youtube.com/watch?v=xLScK_NXUN0&list=PL51Avx1s9tVuTu0VIJXUM7HDN2ziqHGJb&index=13" target="_blank" rel="noreferrer">Gait test video</a>
+                </p>
+              </div>
+              <div class="timer-grid">
+                <div class="timer-card">
+                  <h3>Trial 1</h3>
+                  <output id="gait-trial-1-display" class="timer-display">00:0 m/sec</output>
+                  <button type="button" id="gait-trial-1-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-1">Start</button>
+                </div>
+                <div class="timer-card">
+                  <h3>Trial 2</h3>
+                  <output id="gait-trial-2-display" class="timer-display">00:0 m/sec</output>
+                  <button type="button" id="gait-trial-2-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-2">Start</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Submit</button>
+            <button type="reset" class="btn">Reset</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year-3"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/registration.js"></script>
+  </body>
+</html>

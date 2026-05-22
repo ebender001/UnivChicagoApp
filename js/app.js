@@ -8,6 +8,7 @@
   document.addEventListener('DOMContentLoaded', function(){
     setYear('year');
     setYear('year-2');
+    setYear('year-3');
 
     // Highlight active nav link (simple): adds `active` to matching href
     var links = document.querySelectorAll('.main-nav a');
