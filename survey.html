@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Survey</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html">BeFitMe</a>
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="index.html" class="nav-link">Dashboard</a>
+          <a href="survey.html" class="nav-link active">Survey</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="container">
+      <section class="card">
+        <h1 class="page-title">BeFitMe Survey</h1>
+        <p class="lead">Please answer each question. You can use the Reset button if you need to start over.</p>
+
+        <form id="survey-form" class="survey-form">
+          <!--
+            Survey fields: replace or add more fields as required.
+            The user requested a gender radio group as the first field.
+          -->
+
+          <fieldset class="form-row">
+            <legend>What is your gender?</legend>
+            <label class="choice" for="gender-male">
+              <input type="radio" id="gender-male" name="gender" value="Male" required />
+              <span>Male</span>
+            </label>
+            <label class="choice" for="gender-female">
+              <input type="radio" id="gender-female" name="gender" value="Female" />
+              <span>Female</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>How tall are you?</legend>
+            <div class="height-fields">
+              <div>
+                <label for="height-feet">Feet</label>
+                <input type="number" id="height-feet" name="heightFeet" min="1" max="8" inputmode="numeric" required />
+              </div>
+              <div>
+                <label for="height-inches">Inches</label>
+                <input type="number" id="height-inches" name="heightInches" min="0" max="11" inputmode="numeric" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>Did you have intentional weight loss, for example due to dieting or exercise?</legend>
+            <label class="choice" for="intentional-weight-loss-yes">
+              <input type="radio" id="intentional-weight-loss-yes" name="intentionalWeightLoss" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="intentional-weight-loss-no">
+              <input type="radio" id="intentional-weight-loss-no" name="intentionalWeightLoss" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>In the last week, how often did you feel that everything you did was an effort?</legend>
+            <label class="choice" for="effort-none">
+              <input type="radio" id="effort-none" name="everythingWasEffort" value="None of the time" required />
+              <span>None of the time</span>
+            </label>
+            <label class="choice" for="effort-some">
+              <input type="radio" id="effort-some" name="everythingWasEffort" value="Some or a little of the time (1-2 days)" />
+              <span>Some or a little of the time (1-2 days)</span>
+            </label>
+            <label class="choice" for="effort-moderate">
+              <input type="radio" id="effort-moderate" name="everythingWasEffort" value="A moderate amount of the time (3-4 days)" />
+              <span>A moderate amount of the time (3-4 days)</span>
+            </label>
+            <label class="choice" for="effort-most">
+              <input type="radio" id="effort-most" name="everythingWasEffort" value="Most of the time (>4 days)" />
+              <span>Most of the time (&gt;4 days)</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>In the last week, how often did you feel that you could not get going?</legend>
+            <label class="choice" for="could-not-get-going-none">
+              <input type="radio" id="could-not-get-going-none" name="couldNotGetGoing" value="None of the time" required />
+              <span>None of the time</span>
+            </label>
+            <label class="choice" for="could-not-get-going-some">
+              <input type="radio" id="could-not-get-going-some" name="couldNotGetGoing" value="Some or a little of the time (1-2 days)" />
+              <span>Some or a little of the time (1-2 days)</span>
+            </label>
+            <label class="choice" for="could-not-get-going-moderate">
+              <input type="radio" id="could-not-get-going-moderate" name="couldNotGetGoing" value="A moderate amount of the time (3-4 days)" />
+              <span>A moderate amount of the time (3-4 days)</span>
+            </label>
+            <label class="choice" for="could-not-get-going-most">
+              <input type="radio" id="could-not-get-going-most" name="couldNotGetGoing" value="Most of the time (>4 days)" />
+              <span>Most of the time (&gt;4 days)</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you walked for exercise?</legend>
+            <label class="choice" for="walked-for-exercise-yes">
+              <input type="radio" id="walked-for-exercise-yes" name="walkedForExercise" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="walked-for-exercise-no">
+              <input type="radio" id="walked-for-exercise-no" name="walkedForExercise" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="walking-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="walking-times">How many times in the past two weeks?</label>
+              <input type="number" id="walking-times" name="walkingTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="walking-minutes">How many minutes on average per session do you walk?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="walking-minutes-output" for="walking-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="walking-minutes" name="walkingMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="walking-months">How many months per year do you walk for exercise?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="walking-months-output" for="walking-months">0 months</output>
+              </div>
+              <input type="range" id="walking-months" name="walkingMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <fieldset class="form-row">
+            <legend>During the past two weeks, have you done moderately strenuous household chores like scrubbing or vacuuming?</legend>
+            <label class="choice" for="chores-yes">
+              <input type="radio" id="chores-yes" name="moderatelyStrenuousChores" value="Yes" required />
+              <span>Yes</span>
+            </label>
+            <label class="choice" for="chores-no">
+              <input type="radio" id="chores-no" name="moderatelyStrenuousChores" value="No" />
+              <span>No</span>
+            </label>
+          </fieldset>
+
+          <div id="chores-follow-up" class="follow-up" hidden>
+            <div class="form-row">
+              <label for="chores-times">How many times in the past two weeks?</label>
+              <input type="number" id="chores-times" name="choresTimesTwoWeeks" min="0" step="1" inputmode="numeric" />
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="chores-minutes">How many minutes on average per session do you do moderately strenuous household chores?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="chores-minutes-output" for="chores-minutes">0 minutes</output>
+              </div>
+              <input type="range" id="chores-minutes" name="choresMinutesPerSession" min="0" max="120" step="5" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>120 or more</span>
+              </div>
+            </div>
+
+            <div class="form-row slider-row">
+              <label for="chores-months">How many months per year do you do moderately strenuous household chores?</label>
+              <div class="range-value" aria-live="polite">
+                <output id="chores-months-output" for="chores-months">0 months</output>
+              </div>
+              <input type="range" id="chores-months" name="choresMonthsPerYear" min="0" max="12" step="1" value="0" />
+              <div class="range-limits" aria-hidden="true">
+                <span>0</span>
+                <span>12</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future fields can be added here. Example: ethnicity, comorbidities, etc. -->
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Submit</button>
+            <button type="reset" class="btn">Reset</button>
+          </div>
+        </form>
+
+        <div id="survey-success" class="success" role="status" aria-live="polite" hidden></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year-2"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/survey.js"></script>
+  </body>
+</html>
