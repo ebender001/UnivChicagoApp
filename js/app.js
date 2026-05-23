@@ -120,6 +120,21 @@
     return 'Unable to log in. Please check your username and password.';
   }
 
+  function runCloudFunction(functionName, params){
+    var user = getStoredCurrentUser();
+    if(!user || !user.sessionToken){
+      return Promise.reject(new Error('Login is required.'));
+    }
+
+    return loadParseSdk().then(function(){
+      if(!initializeParse()) throw new Error('Parse could not be loaded.');
+
+      return window.Parse.Cloud.run(functionName, params || {}, {
+        sessionToken: user.sessionToken
+      });
+    });
+  }
+
   function createLoginOverlay(){
     var wrapper = document.createElement('div');
     wrapper.id = 'login-overlay';
@@ -303,7 +318,8 @@
   window.BeFitMeAuth = {
     applyLoginResult: applyLoginResult,
     updateHeaderProfile: updateHeaderProfile,
-    clearLoginState: clearLoginState
+    clearLoginState: clearLoginState,
+    runCloudFunction: runCloudFunction
   };
 
   document.addEventListener('DOMContentLoaded', function(){

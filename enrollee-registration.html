@@ -19,10 +19,21 @@
           <div class="form-row">
             <label for="enrollee-number">Enrollee Number</label>
             <div class="input-action-row">
-              <input type="text" id="enrollee-number" name="enrolleeNumber" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="Enrollee Number" />
+              <input type="text" id="enrollee-number" name="enrolleeNumber" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="Enrollee Number" required />
               <button type="button" id="generate-enrollee-number" class="btn primary">Generate</button>
             </div>
             <p class="field-note">After generating a number, don't forget to register the MRN on Red Cap</p>
+          </div>
+
+          <div class="date-field-row">
+            <div class="form-row">
+              <label for="start-date">Start Date</label>
+              <input type="date" id="start-date" name="startDate" />
+            </div>
+            <div class="form-row">
+              <label for="stop-date">Stop Date</label>
+              <input type="date" id="stop-date" name="stopDate" />
+            </div>
           </div>
 
           <fieldset class="form-row compact-choice-group">
@@ -140,6 +151,8 @@
             <button type="submit" class="btn primary">Submit</button>
             <button type="reset" class="btn">Reset</button>
           </div>
+
+          <div id="registration-status" role="status" aria-live="polite" hidden></div>
         </form>
       </section>
     </main>

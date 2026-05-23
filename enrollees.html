@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Enrollees</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div data-site-header></div>
+
+    <main id="main-content" class="container">
+      <section class="card">
+        <h1 class="page-title">Enrollees</h1>
+        <p class="lead">Recent enrollee registrations are listed below.</p>
+
+        <div id="enrollees-status" class="muted" role="status" aria-live="polite">Loading enrollees...</div>
+
+        <div class="table-wrap" id="enrollees-table-wrap" hidden>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Enrollee Number</th>
+                <th scope="col">Enroll Date</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">Stop Date</th>
+                <th scope="col">Survey</th>
+                <th scope="col">Edit</th>
+              </tr>
+            </thead>
+            <tbody id="enrollees-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/enrollees.js"></script>
+  </body>
+</html>

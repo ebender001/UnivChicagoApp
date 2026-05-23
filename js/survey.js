@@ -13,11 +13,44 @@
     return data;
   }
 
-  function showSuccess(message){
+  function showError(message){
     var box = document.getElementById('survey-success');
     if(!box) return;
     box.textContent = message;
     box.hidden = false;
+  }
+
+  function showCompletionOverlay(){
+    var overlay = document.createElement('div');
+    overlay.className = 'survey-completion-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'survey-completion-title');
+    overlay.innerHTML = [
+      '<div class="survey-completion-panel">',
+      '<h2 id="survey-completion-title">Thank you for completing the survey!</h2>',
+      '<p>Give the iPad to the Medical Assistant to continue your registration.</p>',
+      '<button type="button" class="btn primary" id="survey-completion-ok">OK</button>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+
+    var okButton = document.getElementById('survey-completion-ok');
+    if(okButton){
+      okButton.focus();
+      okButton.addEventListener('click', function(){
+        window.location.href = 'enrollee-registration.html';
+      });
+    }
+  }
+
+  function setSubmitState(form, saving){
+    var submit = form.querySelector('[type="submit"]');
+    if(!submit) return;
+
+    submit.disabled = saving;
+    submit.textContent = saving ? 'Saving...' : 'Submit';
   }
 
   function setSectionVisibility(section, visible){
@@ -238,21 +271,26 @@
 
       var payload = collectForm(form);
 
-      // Temporary: log the collected object to the console
       console.log('Survey payload:', payload);
+      setSubmitState(form, true);
 
-      // TODO: Replace with actual submission logic to Back4App / Parse
-      // Example placeholder:
-      // Parse.initialize("APPLICATION_ID", "JAVASCRIPT_KEY");
-      // var Survey = Parse.Object.extend('Survey');
-      // var s = new Survey();
-      // s.save(payload).then(...)
+      if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+        showError('Login is not ready. Please refresh and try again.');
+        setSubmitState(form, false);
+        return;
+      }
 
-      showSuccess('Survey saved locally (placeholder). See console for payload.');
-
-      window.location.href = 'enrollee-registration.html';
-
-      // Future: show validation errors, send to server, handle auth, show loading state
+      window.BeFitMeAuth.runCloudFunction('saveSurveyResults', {
+        survey: payload
+      }).then(function(result){
+        console.log('Survey saved:', result);
+        showCompletionOverlay();
+      }).catch(function(error){
+        console.log('Survey save failed:', error);
+        showError(error && error.message ? error.message : 'Unable to save survey.');
+      }).finally(function(){
+        setSubmitState(form, false);
+      });
     });
   });
 

@@ -104,6 +104,14 @@
     Object.keys(gaitTimers).forEach(resetGaitTimer);
   }
 
+  function getGaitValues(){
+    return ['gait-trial-1', 'gait-trial-2'].map(function(timerId){
+      var timer = gaitTimers[timerId];
+      if(!timer || !timer.display) return '';
+      return timer.display.textContent;
+    });
+  }
+
   function toggleGaitTimer(timerId){
     var timer = gaitTimers[timerId];
     if(!timer) return;
@@ -238,6 +246,42 @@
     });
   }
 
+  function collectRegistrationForm(form){
+    var data = {};
+    var fm = new FormData(form);
+
+    fm.forEach(function(value, key){
+      data[key] = value;
+    });
+
+    data.grip = [
+      data.handGrip1,
+      data.handGrip2,
+      data.handGrip3
+    ];
+    data.gait = getGaitValues();
+
+    return data;
+  }
+
+  function setSubmitState(form, saving){
+    var submit = form.querySelector('[type="submit"]');
+    if(!submit) return;
+
+    submit.disabled = saving;
+    submit.textContent = saving ? 'Saving...' : 'Submit';
+  }
+
+  function showRegistrationStatus(message, isError){
+    var status = document.getElementById('registration-status');
+    if(!status) return;
+
+    status.textContent = message;
+    status.hidden = false;
+    status.classList.toggle('form-error', Boolean(isError));
+    status.classList.toggle('success', !isError);
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.querySelector('.registration-page form');
     var input = document.getElementById('enrollee-number');
@@ -270,6 +314,36 @@
           syncGripTestFollowUp();
           syncGaitTestFollowUp();
         }, 0);
+      });
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+
+        if(!form.checkValidity()){
+          form.reportValidity();
+          return;
+        }
+
+        if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+          showRegistrationStatus('Login is not ready. Please refresh and try again.', true);
+          return;
+        }
+
+        var payload = collectRegistrationForm(form);
+        console.log('Registration payload:', payload);
+        setSubmitState(form, true);
+
+        window.BeFitMeAuth.runCloudFunction('saveEnrollee', {
+          enrollee: payload
+        }).then(function(result){
+          console.log('Enrollee saved:', result);
+          showRegistrationStatus('Registration saved.', false);
+        }).catch(function(error){
+          console.log('Enrollee save failed:', error);
+          showRegistrationStatus(error && error.message ? error.message : 'Unable to save registration.', true);
+        }).finally(function(){
+          setSubmitState(form, false);
+        });
       });
     }
   });

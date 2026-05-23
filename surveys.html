@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Surveys</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div data-site-header></div>
+
+    <main id="main-content" class="container">
+      <section class="card">
+        <h1 class="page-title">Surveys</h1>
+        <p class="lead">Surveys that still need enrollee registration are listed below.</p>
+
+        <div id="surveys-status" class="muted" role="status" aria-live="polite">Loading surveys...</div>
+
+        <div class="table-wrap" id="surveys-table-wrap" hidden>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Survey Date</th>
+                <th scope="col">Survey ID</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="surveys-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/surveys.js"></script>
+  </body>
+</html>
