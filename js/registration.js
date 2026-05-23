@@ -204,7 +204,17 @@
     var popover = document.getElementById(popoverId);
     if(!helpButton || !popover) return;
 
+    document.body.appendChild(popover);
+
     function setPopover(open){
+      document.querySelectorAll('.help-popover').forEach(function(otherPopover){
+        if(otherPopover !== popover) otherPopover.hidden = true;
+      });
+
+      document.querySelectorAll('.help-btn[aria-expanded="true"]').forEach(function(otherButton){
+        if(otherButton !== helpButton) otherButton.setAttribute('aria-expanded', 'false');
+      });
+
       popover.hidden = !open;
       helpButton.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
@@ -219,6 +229,13 @@
         helpButton.focus();
       });
     }
+
+    popover.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape'){
+        setPopover(false);
+        helpButton.focus();
+      }
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function(){
