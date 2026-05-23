@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "name": "UnivChicagoApp",
+      "path": "."
+    },
+    {
+      "name": "UnivChicagoCloudCode",
+      "path": "../UnivChicagoCloudCode"
+    }
+  ],
+  "settings": {
+    "chat.tools.terminal.autoApprove": {
+      "b4a": true,
+      "mv": true
+    }
+  }
+}

@@ -20,6 +20,46 @@
     box.hidden = false;
   }
 
+  function setSectionVisibility(section, visible){
+    if(!section) return;
+    window.clearTimeout(section.hideTimer);
+    window.clearTimeout(section.heightTimer);
+
+    if(visible){
+      if(section.hidden){
+        section.hidden = false;
+        section.classList.remove('is-visible');
+      }
+
+      section.style.height = '0px';
+      window.requestAnimationFrame(function(){
+        section.classList.add('is-visible');
+        section.style.height = section.scrollHeight + 'px';
+        section.heightTimer = window.setTimeout(function(){
+          if(section.classList.contains('is-visible')){
+            section.style.height = 'auto';
+          }
+        }, 340);
+      });
+      return;
+    }
+
+    if(section.hidden) return;
+
+    section.style.height = section.offsetHeight + 'px';
+    section.offsetHeight;
+    section.classList.remove('is-visible');
+    window.requestAnimationFrame(function(){
+      section.style.height = '0px';
+      section.hideTimer = window.setTimeout(function(){
+        if(!section.classList.contains('is-visible')){
+          section.hidden = true;
+          section.style.height = '';
+        }
+      }, 340);
+    });
+  }
+
   function setFollowUpRequired(followUpId, required){
     var followUp = document.getElementById(followUpId);
     if(!followUp) return;
@@ -72,7 +112,7 @@
     function syncFollowUp(){
       var selected = document.querySelector('input[name="' + config.choiceName + '"]:checked');
       var showFollowUp = selected && selected.value === 'Yes';
-      followUp.hidden = !showFollowUp;
+      setSectionVisibility(followUp, Boolean(showFollowUp));
       setFollowUpRequired(config.followUpId, Boolean(showFollowUp));
       updateActivityRangeOutputs(config);
     }
@@ -149,7 +189,7 @@
   function resetActivityFollowUps(){
     activitySections.forEach(function(config){
       var followUp = document.getElementById(config.followUpId);
-      if(followUp) followUp.hidden = true;
+      setSectionVisibility(followUp, false);
       setFollowUpRequired(config.followUpId, false);
       updateActivityRangeOutputs(config);
     });
@@ -162,7 +202,7 @@
     if(!noChange || !previousWeightGroup || !previousWeight) return;
 
     var hidePreviousWeight = noChange.checked;
-    previousWeightGroup.hidden = hidePreviousWeight;
+    setSectionVisibility(previousWeightGroup, !hidePreviousWeight);
     previousWeight.disabled = hidePreviousWeight;
     previousWeight.required = !hidePreviousWeight;
 
