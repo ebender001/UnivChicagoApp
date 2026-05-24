@@ -213,7 +213,7 @@
 
   function isPublicHref(href){
     if(!href) return false;
-    return href === 'survey.html' || href.endsWith('/survey.html');
+    return href === 'index.html' || href === './' || href === '/' || href.endsWith('/index.html') || href === 'survey.html' || href.endsWith('/survey.html') || href === 'accept-invite.html' || href.endsWith('/accept-invite.html');
   }
 
   function updateHeaderVisibility(){
@@ -247,10 +247,17 @@
 
     authButton.addEventListener('click', function(){
       if(hasActiveLogin()){
+        if(!window.confirm('Log out of BeFitMe?')){
+          return;
+        }
+
         clearLoginState();
         closeLogin();
         updateAuthState();
         console.log('Logout successful');
+        if(!location.pathname.endsWith('index.html') && !location.pathname.endsWith('/')){
+          window.location.href = 'index.html';
+        }
         return;
       }
 
@@ -266,6 +273,10 @@
       if(!link || hasActiveLogin() || isPublicHref(link.getAttribute('href'))) return;
 
       ev.preventDefault();
+      if(link.dataset.loginAlert){
+        window.alert(link.dataset.loginAlert);
+        return;
+      }
       openLogin();
     });
   }

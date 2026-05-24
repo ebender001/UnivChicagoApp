@@ -14,8 +14,9 @@
       <section class="welcome-card card">
         <h1 class="page-title">BeFitMe Dashboard</h1>
         <p class="lead">Use the Survey page to enter participant information. The buttons and form fields are designed to be easy to read and easy to press.</p>
-        <p>
+        <p class="dashboard-actions">
           <a class="btn primary" href="survey.html">Start a New Survey</a>
+          <a class="btn" href="enrollee-registration.html" data-login-alert="Please log in before registering a new patient.">Register New Patient</a>
         </p>
       </section>
 
@@ -28,14 +29,14 @@
           <h2>Enrollees</h2>
           <p class="muted">Access the list of recent enrollees.</p>
         </a>
-        <article class="card">
+        <a class="card dashboard-card-link" href="data-export.html">
           <h2>Data Export</h2>
           <p class="muted">Placeholder for export tools (CSV, JSON).</p>
-        </article>
-        <article class="card">
+        </a>
+        <a class="card dashboard-card-link" href="admin.html">
           <h2>Admin</h2>
-          <p class="muted">Placeholder for project settings and auth management.</p>
-        </article>
+          <p class="muted">Manage users, institutions, and specialties.</p>
+        </a>
       </section>
     </main>
 

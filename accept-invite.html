@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Invitation</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div data-site-header></div>
+
+    <main id="main-content" class="container">
+      <section class="card admin-card">
+        <h1 class="page-title">Accept Invitation</h1>
+        <p class="lead">Create your dashboard username and password.</p>
+
+        <form id="accept-invite-form" class="survey-form">
+          <div class="form-row">
+            <label for="invite-username">Username</label>
+            <input type="text" id="invite-username" name="username" autocomplete="username" required />
+          </div>
+
+          <div class="form-row">
+            <label for="invite-password">Password</label>
+            <input type="password" id="invite-password" name="password" autocomplete="new-password" minlength="8" required />
+          </div>
+
+          <div class="form-row">
+            <label for="invite-password-confirm">Confirm Password</label>
+            <input type="password" id="invite-password-confirm" name="passwordConfirm" autocomplete="new-password" minlength="8" required />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Activate Account</button>
+          </div>
+
+          <div id="accept-invite-status" role="status" aria-live="polite" hidden></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/accept-invite.js"></script>
+  </body>
+</html>

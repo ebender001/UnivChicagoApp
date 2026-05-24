@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Admin</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div data-site-header></div>
+
+    <main id="main-content" class="container">
+      <section class="card admin-card">
+        <h1 class="page-title">Admin</h1>
+        <p class="lead">Manage dashboard access and administrative tools.</p>
+      </section>
+
+      <section class="card admin-tool-card">
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="dashboard-user-invite-form" data-collapse-toggle data-email-invitation-toggle>
+          <span>Invite New User</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
+
+        <form id="dashboard-user-invite-form" class="survey-form collapse-panel" hidden>
+          <div class="form-row">
+            <label for="invite-email">Email</label>
+            <input type="email" id="invite-email" name="email" autocomplete="email" required />
+          </div>
+
+          <div class="form-row">
+            <label for="invite-name">Name</label>
+            <input type="text" id="invite-name" name="name" autocomplete="name" />
+          </div>
+
+          <div class="form-row">
+            <label for="invite-role">Role</label>
+            <select id="invite-role" name="role" required></select>
+          </div>
+
+          <div class="form-row">
+            <label for="invite-institution">Institution</label>
+            <select id="invite-institution" name="institution" required></select>
+          </div>
+
+          <div class="form-row">
+            <label for="invite-specialty">Specialty</label>
+            <select id="invite-specialty" name="specialty" required></select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Send Invite</button>
+            <button type="reset" class="btn">Reset</button>
+          </div>
+
+          <div id="invite-status" role="status" aria-live="polite" hidden></div>
+        </form>
+      </section>
+
+      <section class="card admin-tool-card" data-super-admin-section>
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="users-panel" data-collapse-toggle>
+          <span>Users</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
+
+        <div id="users-panel" class="collapse-panel" hidden>
+          <div id="user-list-status" class="muted" role="status" aria-live="polite">Loading users...</div>
+
+          <div id="users-list-wrap" class="admin-scroll-list" hidden>
+            <table class="data-table admin-list-table admin-users-table">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Institution</th>
+                  <th scope="col">Specialty</th>
+                  <th scope="col">Delete</th>
+                </tr>
+              </thead>
+              <tbody id="users-list-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card admin-tool-card" data-super-admin-section>
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="institutions-panel" data-collapse-toggle>
+          <span>Institutions</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
+
+        <div id="institutions-panel" class="collapse-panel" hidden>
+          <form id="add-institution-form" class="survey-form admin-inline-form">
+            <div class="form-row">
+              <label for="institution-name">Institution Name</label>
+              <input type="text" id="institution-name" name="name" autocomplete="organization" placeholder="e.g., University of Chicago" required />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn primary">Add Institution</button>
+              <button type="reset" class="btn">Reset</button>
+            </div>
+
+            <div id="institution-status" role="status" aria-live="polite" hidden></div>
+          </form>
+
+          <div id="institution-list-status" class="muted" role="status" aria-live="polite">Loading institutions...</div>
+
+          <div id="institutions-list-wrap" class="admin-scroll-list" hidden>
+            <table class="data-table admin-list-table">
+              <thead>
+                <tr>
+                  <th scope="col">Institution</th>
+                  <th scope="col">Delete</th>
+                </tr>
+              </thead>
+              <tbody id="institutions-list-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card admin-tool-card" data-super-admin-section>
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="specialties-panel" data-collapse-toggle>
+          <span>Specialties</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
+
+        <div id="specialties-panel" class="collapse-panel" hidden>
+          <form id="add-specialty-form" class="survey-form admin-inline-form">
+            <div class="form-row">
+              <label for="specialty-name">Specialty Name</label>
+              <input type="text" id="specialty-name" name="name" placeholder="e.g., Thoracic Surgery" required />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn primary">Add Specialty</button>
+              <button type="reset" class="btn">Reset</button>
+            </div>
+
+            <div id="specialty-status" role="status" aria-live="polite" hidden></div>
+          </form>
+
+          <div id="specialty-list-status" class="muted" role="status" aria-live="polite">Loading specialties...</div>
+
+          <div id="specialties-list-wrap" class="admin-scroll-list" hidden>
+            <table class="data-table admin-list-table">
+              <thead>
+                <tr>
+                  <th scope="col">Specialty</th>
+                  <th scope="col">Delete</th>
+                </tr>
+              </thead>
+              <tbody id="specialties-list-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

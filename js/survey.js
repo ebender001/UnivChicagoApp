@@ -10,6 +10,11 @@
       // Normalize numeric fields if needed later
       data[key] = value;
     });
+
+    var params = new URLSearchParams(window.location.search);
+    var enrolleeId = params.get('enrolleeId');
+    if(enrolleeId) data.enrolleeId = enrolleeId;
+
     return data;
   }
 

@@ -13,21 +13,54 @@
     <main id="main-content" class="container">
       <section class="card">
         <h1 class="page-title">Surveys</h1>
-        <p class="lead">Surveys that still need enrollee registration are listed below.</p>
+        <p class="lead">Review survey records and continue registration when needed.</p>
+      </section>
 
-        <div id="surveys-status" class="muted" role="status" aria-live="polite">Loading surveys...</div>
+      <section class="card admin-tool-card">
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="unenrolled-surveys-panel" data-collapse-toggle>
+          <span>Surveys Needing Enrollee Registration</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
 
-        <div class="table-wrap" id="surveys-table-wrap" hidden>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th scope="col">Survey Date</th>
-                <th scope="col">Survey ID</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody id="surveys-table-body"></tbody>
-          </table>
+        <div id="unenrolled-surveys-panel" class="collapse-panel" hidden>
+          <div id="unenrolled-surveys-status" class="muted" role="status" aria-live="polite">Loading surveys...</div>
+
+          <div class="table-wrap" id="unenrolled-surveys-table-wrap" hidden>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Survey Date</th>
+                  <th scope="col">Survey ID</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="unenrolled-surveys-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card admin-tool-card">
+        <button type="button" class="collapse-toggle" aria-expanded="false" aria-controls="all-surveys-panel" data-collapse-toggle>
+          <span>All Surveys</span>
+          <span class="collapse-indicator" aria-hidden="true">+</span>
+        </button>
+
+        <div id="all-surveys-panel" class="collapse-panel" hidden>
+          <div id="all-surveys-status" class="muted" role="status" aria-live="polite">Loading surveys...</div>
+
+          <div class="table-wrap" id="all-surveys-table-wrap" hidden>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Survey Date</th>
+                  <th scope="col">Survey ID</th>
+                  <th scope="col">Enrollee</th>
+                </tr>
+              </thead>
+              <tbody id="all-surveys-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>

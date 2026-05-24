@@ -1,5 +1,5 @@
 // surveys.js
-// Loads surveys that still need enrollee registration.
+// Loads survey lists.
 
 (function(){
   function formatDateTime(value){
@@ -17,8 +17,8 @@
     });
   }
 
-  function setStatus(message){
-    var status = document.getElementById('surveys-status');
+  function setStatus(elementId, message){
+    var status = document.getElementById(elementId);
     if(status) status.textContent = message;
   }
 
@@ -42,9 +42,9 @@
     return cell;
   }
 
-  function renderRows(surveys){
-    var body = document.getElementById('surveys-table-body');
-    var wrap = document.getElementById('surveys-table-wrap');
+  function renderUnenrolledRows(surveys){
+    var body = document.getElementById('unenrolled-surveys-table-body');
+    var wrap = document.getElementById('unenrolled-surveys-table-wrap');
     if(!body || !wrap) return;
 
     body.textContent = '';
@@ -60,9 +60,27 @@
     wrap.hidden = false;
   }
 
-  function loadSurveys(){
+  function renderAllRows(surveys){
+    var body = document.getElementById('all-surveys-table-body');
+    var wrap = document.getElementById('all-surveys-table-wrap');
+    if(!body || !wrap) return;
+
+    body.textContent = '';
+
+    surveys.forEach(function(survey){
+      var row = document.createElement('tr');
+      row.appendChild(createCell(formatDateTime(survey.createdAt)));
+      row.appendChild(createCell(survey.objectId));
+      row.appendChild(createCell(survey.enrollee && survey.enrollee.objectId ? survey.enrollee.objectId : 'Not linked'));
+      body.appendChild(row);
+    });
+
+    wrap.hidden = false;
+  }
+
+  function loadUnenrolledSurveys(){
     if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
-      setStatus('Login is not ready. Please refresh and try again.');
+      setStatus('unenrolled-surveys-status', 'Login is not ready. Please refresh and try again.');
       return;
     }
 
@@ -72,17 +90,91 @@
       var surveys = response && response.results ? response.results : [];
 
       if(!surveys.length){
-        setStatus('No surveys need registration.');
+        setStatus('unenrolled-surveys-status', 'No surveys need registration.');
         return;
       }
 
-      setStatus('');
-      renderRows(surveys);
+      setStatus('unenrolled-surveys-status', '');
+      renderUnenrolledRows(surveys);
     }).catch(function(error){
-      console.log('Unable to load surveys:', error);
-      setStatus(error && error.message ? error.message : 'Unable to load surveys.');
+      console.log('Unable to load surveys needing registration:', error);
+      setStatus('unenrolled-surveys-status', error && error.message ? error.message : 'Unable to load surveys.');
     });
   }
 
-  document.addEventListener('DOMContentLoaded', loadSurveys);
+  function loadAllSurveys(){
+    if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+      setStatus('all-surveys-status', 'Login is not ready. Please refresh and try again.');
+      return;
+    }
+
+    window.BeFitMeAuth.runCloudFunction('listSurveys', {
+      limit: 100
+    }).then(function(response){
+      var surveys = response && response.results ? response.results : [];
+
+      if(!surveys.length){
+        setStatus('all-surveys-status', 'No surveys found.');
+        return;
+      }
+
+      setStatus('all-surveys-status', '');
+      renderAllRows(surveys);
+    }).catch(function(error){
+      console.log('Unable to load all surveys:', error);
+      setStatus('all-surveys-status', error && error.message ? error.message : 'Unable to load surveys.');
+    });
+  }
+
+  function setupCollapsibleSections(){
+    document.querySelectorAll('[data-collapse-toggle]').forEach(function(button){
+      var panel = document.getElementById(button.getAttribute('aria-controls'));
+      if(!panel) return;
+
+      button.addEventListener('click', function(){
+        var expanded = button.getAttribute('aria-expanded') === 'true';
+        window.clearTimeout(panel.hideTimer);
+        window.clearTimeout(panel.heightTimer);
+
+        if(expanded){
+          panel.style.height = panel.offsetHeight + 'px';
+          panel.offsetHeight;
+          button.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('is-visible');
+
+          window.requestAnimationFrame(function(){
+            panel.style.height = '0px';
+            panel.hideTimer = window.setTimeout(function(){
+              if(!panel.classList.contains('is-visible')){
+                panel.hidden = true;
+                panel.style.height = '';
+              }
+            }, 300);
+          });
+          return;
+        }
+
+        panel.hidden = false;
+        panel.classList.remove('is-visible');
+        panel.style.height = '0px';
+        button.setAttribute('aria-expanded', 'true');
+
+        window.requestAnimationFrame(function(){
+          panel.classList.add('is-visible');
+          panel.style.height = panel.scrollHeight + 'px';
+          panel.heightTimer = window.setTimeout(function(){
+            if(panel.classList.contains('is-visible')){
+              panel.style.height = 'auto';
+            }
+          }, 300);
+        });
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setupCollapsibleSections();
+    loadUnenrolledSurveys();
+    loadAllSurveys();
+  });
 })();
