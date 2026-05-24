@@ -179,7 +179,8 @@ input:focus-visible{
   box-shadow:0 0 0 2px var(--accent-dark), 0 0 0 7px var(--focus);
 }
 .range-limits{ display:flex; justify-content:space-between; gap:1rem; color:var(--muted); font-weight:700; }
-.form-actions{ display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.5rem; }
+.form-actions{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:0.75rem; margin-top:0.5rem; }
+.form-actions .btn{ width:100%; }
 .success{ margin-top:1rem; padding:0.85rem; background:#e8f5ed; border:2px solid #8cc59d; border-radius:6px; color:#074f22; font-weight:700; }
 
 /* Registration page */
@@ -244,7 +245,9 @@ input:focus-visible{
 .timer-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:0.75rem; }
 .timer-card{ display:grid; gap:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:var(--radius); background:#fff; }
 .timer-card h3{ margin:0; color:var(--accent); font-size:1rem; }
+.timer-label{ color:var(--muted); font-weight:800; font-size:0.9rem; }
 .timer-display{ font-variant-numeric:tabular-nums; font-weight:800; font-size:1.35rem; }
+.gait-speed{ font-variant-numeric:tabular-nums; color:var(--text); font-weight:800; }
 .registration-page .timer-button{ width:max-content; min-width:90px; }
 .registration-page .timer-button.timer-start{ border-color:#16803a; color:#16803a; background:#fff; }
 .registration-page .timer-button.timer-stop{ border-color:#b42318; color:#b42318; background:#fff; }
@@ -275,6 +278,7 @@ input:focus-visible{
 }
 .login-panel h2{ margin:0; color:var(--accent); font-size:1.35rem; }
 .login-panel .btn{ width:100%; }
+.login-actions{ display:grid; gap:0.75rem; }
 
 /* Survey completion */
 .survey-completion-overlay{
@@ -309,6 +313,7 @@ input:focus-visible{
 .data-table th{ color:var(--accent); font-size:0.95rem; background:#fafafa; }
 .data-table tbody tr:last-child td{ border-bottom:0; }
 .table-action-button{ min-height:40px; padding:0.45rem 0.7rem; font-size:0.9rem; }
+.continue-enrollment-button{ border-color:var(--accent); color:var(--accent); }
 .icon-button{
   display:inline-flex;
   align-items:center;
@@ -323,6 +328,22 @@ input:focus-visible{
 .icon-button svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .table-action-button:disabled,
 .icon-button:disabled{ cursor:not-allowed; opacity:0.65; }
+
+/* Detail views */
+.detail-section{ margin-top:1.25rem; }
+.detail-section h2{ margin:0 0 0.75rem; color:var(--accent); font-size:1.15rem; }
+.score-placeholder{ margin:0; font-size:1.25rem; font-weight:800; }
+.readonly-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:0.75rem; }
+.readonly-field{ padding:0.75rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fafafa; }
+.readonly-field dt{ margin:0 0 0.25rem; color:var(--muted); font-weight:800; font-size:0.9rem; }
+.readonly-field dd{ margin:0; word-break:break-word; }
+.readonly-survey-form{ max-width:640px; }
+.survey-metadata{ margin:0 0 0.25rem; }
+.readonly-survey-form input:disabled{ color:var(--text); opacity:1; cursor:default; background:#fafafa; }
+.readonly-survey-form .choice{ cursor:default; }
+.readonly-survey-form .choice input{ accent-color:var(--accent); }
+.readonly-survey-form .readonly-follow-up{ height:auto; }
+.readonly-survey-form .readonly-slider-row input[type="range"]:disabled{ opacity:1; }
 
 /* Footer */
 .site-footer{ margin-top:2rem; padding:1rem 0; color:var(--muted); font-size:1rem; }
@@ -342,6 +363,8 @@ input:focus-visible{
   .input-action-row{ grid-template-columns: 1fr; }
   .date-field-row{ grid-template-columns: 1fr; }
   .registration-page .compact-choice-group{ grid-template-columns: 1fr; }
+  .form-actions{ grid-template-columns: 1fr; }
+  .readonly-grid{ grid-template-columns: 1fr; }
   .timer-grid{ grid-template-columns: 1fr; }
   .three-field-row{ grid-template-columns: 1fr; }
   .container{ padding:1rem; }

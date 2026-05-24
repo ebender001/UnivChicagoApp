@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BeFitMe Enrollee Detail</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div data-site-header></div>
+
+    <main id="main-content" class="container">
+      <section class="card">
+        <h1 class="page-title">Enrollee Detail</h1>
+        <p class="lead" id="enrollee-detail-subtitle">Loading enrollee...</p>
+
+        <div id="enrollee-detail-status" class="muted" role="status" aria-live="polite"></div>
+
+        <section class="detail-section" id="frailty-section" hidden>
+          <h2>Frailty Assessment Score</h2>
+          <p class="score-placeholder">Placeholder</p>
+        </section>
+
+        <section class="detail-section" id="survey-readonly-section" hidden>
+          <h2>Survey Form</h2>
+          <div id="survey-readonly-fields"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/enrollee-detail.js"></script>
+  </body>
+</html>

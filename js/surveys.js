@@ -32,10 +32,12 @@
     var cell = document.createElement('td');
     var button = document.createElement('button');
     button.type = 'button';
-    button.className = 'btn table-action-button';
-    button.disabled = true;
+    button.className = 'btn table-action-button continue-enrollment-button';
     button.textContent = 'Continue Enrollment';
     button.setAttribute('aria-label', 'Continue enrollment for survey ' + survey.objectId);
+    button.addEventListener('click', function(){
+      window.location.href = 'enrollee-registration.html?surveyId=' + encodeURIComponent(survey.objectId);
+    });
     cell.appendChild(button);
     return cell;
   }

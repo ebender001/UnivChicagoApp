@@ -27,14 +27,19 @@
     var button = document.createElement('button');
     button.type = 'button';
     button.className = kind === 'survey' ? 'btn table-action-button' : 'icon-button';
-    button.disabled = true;
 
     if(kind === 'survey'){
       button.textContent = 'Survey Results';
       button.setAttribute('aria-label', 'View survey results for enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+      button.addEventListener('click', function(){
+        window.location.href = 'enrollee-detail.html?enrolleeId=' + encodeURIComponent(enrollee.objectId);
+      });
     }else{
       button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"></path><path d="m14 7 3 3"></path></svg>';
       button.setAttribute('aria-label', 'Edit enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+      button.addEventListener('click', function(){
+        window.location.href = 'enrollee-registration.html?enrolleeId=' + encodeURIComponent(enrollee.objectId);
+      });
     }
 
     cell.appendChild(button);

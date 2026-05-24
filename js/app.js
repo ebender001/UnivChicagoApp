@@ -155,7 +155,10 @@
       '<input type="password" id="login-password" name="password" autocomplete="current-password" required />',
       '</div>',
       '<div id="login-error" class="form-error" role="alert" hidden></div>',
+      '<div class="login-actions">',
       '<button type="submit" class="btn primary">Log in</button>',
+      '<button type="button" class="btn" data-login-cancel>Cancel</button>',
+      '</div>',
       '</form>'
     ].join('');
     document.body.appendChild(wrapper);
@@ -208,6 +211,11 @@
     return location.pathname.endsWith('survey.html');
   }
 
+  function isPublicHref(href){
+    if(!href) return false;
+    return href === 'survey.html' || href.endsWith('/survey.html');
+  }
+
   function updateHeaderVisibility(){
     var mainNav = document.querySelector('.main-nav');
     var authButton = document.querySelector('[data-auth-button]');
@@ -225,9 +233,11 @@
     if(authButton) authButton.textContent = isLoggedIn ? 'Log Out' : 'Login';
 
     links.forEach(function(link){
-      link.classList.toggle('is-disabled', !isLoggedIn);
-      link.setAttribute('aria-disabled', String(!isLoggedIn));
-      link.tabIndex = isLoggedIn ? 0 : -1;
+      var isPublicLink = isPublicHref(link.getAttribute('href'));
+      var isDisabled = !isLoggedIn && !isPublicLink;
+      link.classList.toggle('is-disabled', isDisabled);
+      link.setAttribute('aria-disabled', String(isDisabled));
+      link.tabIndex = isDisabled ? -1 : 0;
     });
   }
 
@@ -253,7 +263,7 @@
   function setupNavigationGate(){
     document.addEventListener('click', function(ev){
       var link = ev.target.closest('a[href]');
-      if(!link || hasActiveLogin()) return;
+      if(!link || hasActiveLogin() || isPublicHref(link.getAttribute('href'))) return;
 
       ev.preventDefault();
       openLogin();
@@ -268,8 +278,15 @@
     var username = document.getElementById('login-username');
     var password = document.getElementById('login-password');
     var error = document.getElementById('login-error');
+    var cancel = form ? form.querySelector('[data-login-cancel]') : null;
     var submit = form ? form.querySelector('[type="submit"]') : null;
     if(!overlay || !form) return;
+
+    if(cancel){
+      cancel.addEventListener('click', function(){
+        closeLogin();
+      });
+    }
 
     form.addEventListener('submit', function(ev){
       ev.preventDefault();

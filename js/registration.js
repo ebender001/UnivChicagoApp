@@ -7,6 +7,11 @@
   }
 
   var gaitTimers = {};
+  var editingEnrolleeId = null;
+  var existingGaitValues = [];
+  var existingGripValues = [];
+  var existingGripCompleted = null;
+  var existingGaitCompleted = null;
 
   function setSectionVisibility(section, visible){
     if(!section) return;
@@ -48,23 +53,49 @@
     });
   }
 
-  function formatGaitTime(elapsedMs){
-    var tenths = Math.floor(elapsedMs / 100);
-    var seconds = Math.floor(tenths / 10);
-    var tenth = tenths % 10;
-    return String(seconds).padStart(2, '0') + ':' + tenth + ' m/sec';
-  }
-
-  function updateGaitTimer(timerId){
-    var timer = gaitTimers[timerId];
-    if(!timer) return;
+  function getGaitElapsedMs(timer){
+    if(!timer) return 0;
 
     var elapsed = timer.elapsedMs;
     if(timer.status === 'running'){
       elapsed += performance.now() - timer.startedAt;
     }
 
+    return elapsed;
+  }
+
+  function formatGaitTime(elapsedMs){
+    var seconds = elapsedMs / 1000;
+    return seconds.toFixed(1) + ' sec';
+  }
+
+  function formatGaitSpeed(elapsedMs){
+    if(elapsedMs <= 0) return '';
+
+    var seconds = elapsedMs / 1000;
+    var metersPerSecond = 4 / seconds;
+    return 'Gait speed: ' + metersPerSecond.toFixed(2) + ' m/sec';
+  }
+
+  function getGaitSpeedValue(elapsedMs){
+    if(elapsedMs <= 0) return null;
+
+    var seconds = elapsedMs / 1000;
+    return Number((4 / seconds).toPrecision(2));
+  }
+
+  function updateGaitTimer(timerId){
+    var timer = gaitTimers[timerId];
+    if(!timer) return;
+
+    var elapsed = getGaitElapsedMs(timer);
     if(timer.display) timer.display.textContent = formatGaitTime(elapsed);
+
+    if(timer.speedDisplay){
+      var showSpeed = timer.status === 'stopped' && elapsed > 0;
+      timer.speedDisplay.textContent = showSpeed ? formatGaitSpeed(elapsed) : '';
+      timer.speedDisplay.hidden = !showSpeed;
+    }
   }
 
   function setGaitTimerButton(timer){
@@ -107,8 +138,10 @@
   function getGaitValues(){
     return ['gait-trial-1', 'gait-trial-2'].map(function(timerId){
       var timer = gaitTimers[timerId];
-      if(!timer || !timer.display) return '';
-      return timer.display.textContent;
+      if(!timer || getGaitElapsedMs(timer) <= 0) return null;
+      return getGaitSpeedValue(getGaitElapsedMs(timer));
+    }).filter(function(value){
+      return value !== null;
     });
   }
 
@@ -140,11 +173,13 @@
     document.querySelectorAll('[data-timer-button]').forEach(function(button){
       var timerId = button.getAttribute('data-timer-id');
       var display = document.getElementById(timerId + '-display');
+      var speedDisplay = document.getElementById(timerId + '-speed');
       if(!timerId || !display) return;
 
       gaitTimers[timerId] = {
         button: button,
         display: display,
+        speedDisplay: speedDisplay,
         elapsedMs: 0,
         intervalId: null,
         startedAt: 0,
@@ -261,6 +296,29 @@
     ];
     data.gait = getGaitValues();
 
+    if(editingEnrolleeId){
+      if(existingGripCompleted === true || existingGripCompleted === false){
+        data.canCompleteGripTest = existingGripCompleted ? 'Yes' : 'No';
+      }
+
+      if(existingGaitCompleted === true || existingGaitCompleted === false){
+        data.canCompleteGaitTest = existingGaitCompleted ? 'Yes' : 'No';
+      }
+    }
+
+    if(editingEnrolleeId && existingGripValues.length){
+      data.grip = existingGripValues.slice();
+    }
+
+    if(editingEnrolleeId && existingGaitValues.length){
+      data.gait = existingGaitValues.slice();
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var surveyId = params.get('surveyId');
+    if(surveyId) data.surveyId = surveyId;
+    if(editingEnrolleeId) data.enrolleeId = editingEnrolleeId;
+
     return data;
   }
 
@@ -269,7 +327,7 @@
     if(!submit) return;
 
     submit.disabled = saving;
-    submit.textContent = saving ? 'Saving...' : 'Submit';
+    submit.textContent = saving ? 'Saving...' : editingEnrolleeId ? 'Update' : 'Submit';
   }
 
   function showRegistrationStatus(message, isError){
@@ -282,10 +340,130 @@
     status.classList.toggle('success', !isError);
   }
 
+  function setFieldValue(id, value){
+    var field = document.getElementById(id);
+    if(!field) return;
+    field.value = value === null || value === undefined ? '' : String(value);
+  }
+
+  function formatDateInput(value){
+    if(!value) return '';
+
+    var date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    return date.toISOString().slice(0, 10);
+  }
+
+  function setRadioValue(name, booleanValue){
+    var value = booleanValue === true ? 'Yes' : 'No';
+    var field = document.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if(field) field.checked = true;
+  }
+
+  function setFieldsetDisabled(name, disabled){
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function(field){
+      field.disabled = disabled;
+    });
+  }
+
+  function setFieldsDisabled(ids, disabled){
+    ids.forEach(function(id){
+      var field = document.getElementById(id);
+      if(field) field.disabled = disabled;
+    });
+  }
+
+  function setGaitControlsReadonly(){
+    Object.keys(gaitTimers).forEach(function(timerId, index){
+      var timer = gaitTimers[timerId];
+      var speed = existingGaitValues[index];
+
+      if(timer && timer.button){
+        timer.button.disabled = true;
+        timer.button.textContent = 'Recorded';
+      }
+
+      if(timer && timer.display){
+        timer.display.textContent = 'Original value';
+      }
+
+      if(timer && timer.speedDisplay){
+        timer.speedDisplay.textContent = speed !== undefined ? 'Gait speed: ' + speed + ' m/sec' : 'No gait speed recorded';
+        timer.speedDisplay.hidden = false;
+      }
+    });
+  }
+
+  function setMeasurementsReadonly(){
+    setFieldsetDisabled('canCompleteGripTest', true);
+    setFieldsetDisabled('canCompleteGaitTest', true);
+    setFieldsDisabled(['hand-grip-1', 'hand-grip-2', 'hand-grip-3'], true);
+    setGaitControlsReadonly();
+  }
+
+  function populateRegistrationForm(enrollee){
+    var fields = enrollee && enrollee.fields ? enrollee.fields : {};
+    var title = document.querySelector('.registration-page .page-title');
+    var lead = document.querySelector('.registration-page .lead');
+    var submit = document.querySelector('.registration-page form [type="submit"]');
+    var generateButton = document.getElementById('generate-enrollee-number');
+
+    if(title) title.textContent = 'Edit Enrollee Registration';
+    if(lead) lead.textContent = 'Update the enrollee registration details below.';
+    if(submit) submit.textContent = 'Update';
+    if(generateButton) generateButton.disabled = true;
+
+    setFieldValue('enrollee-number', fields.enrolleeNumber);
+    setFieldValue('start-date', formatDateInput(fields.startDate));
+    setFieldValue('stop-date', formatDateInput(fields.stopDate));
+
+    existingGripCompleted = fields.gripCompleted === true ? true : fields.gripCompleted === false ? false : null;
+    existingGaitCompleted = fields.gaitCompleted === true ? true : fields.gaitCompleted === false ? false : null;
+
+    setRadioValue('canCompleteGripTest', fields.gripCompleted);
+    syncGripTestFollowUp();
+
+    if(Array.isArray(fields.grip)){
+      existingGripValues = fields.grip.slice();
+      setFieldValue('hand-grip-1', fields.grip[0]);
+      setFieldValue('hand-grip-2', fields.grip[1]);
+      setFieldValue('hand-grip-3', fields.grip[2]);
+    }
+
+    setRadioValue('canCompleteGaitTest', fields.gaitCompleted);
+    syncGaitTestFollowUp();
+
+    existingGaitValues = Array.isArray(fields.gait) ? fields.gait.slice() : [];
+
+    setMeasurementsReadonly();
+  }
+
+  function loadEnrolleeForEditing(enrolleeId){
+    if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+      showRegistrationStatus('Login is not ready. Please refresh and try again.', true);
+      return;
+    }
+
+    showRegistrationStatus('Loading enrollee registration...', false);
+
+    window.BeFitMeAuth.runCloudFunction('getEnrolleeDetails', {
+      enrolleeId: enrolleeId
+    }).then(function(result){
+      populateRegistrationForm(result && result.enrollee);
+      var status = document.getElementById('registration-status');
+      if(status && !status.textContent.indexOf('Loading')) status.hidden = true;
+    }).catch(function(error){
+      console.log('Unable to load enrollee for editing:', error);
+      showRegistrationStatus(error && error.message ? error.message : 'Unable to load enrollee registration.', true);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.querySelector('.registration-page form');
     var input = document.getElementById('enrollee-number');
     var button = document.getElementById('generate-enrollee-number');
+    var params = new URLSearchParams(window.location.search);
+    editingEnrolleeId = params.get('enrolleeId');
 
     if(input && button){
       button.addEventListener('click', function(){
@@ -307,6 +485,10 @@
     setupGaitTimers();
     syncGripTestFollowUp();
     syncGaitTestFollowUp();
+
+    if(editingEnrolleeId){
+      loadEnrolleeForEditing(editingEnrolleeId);
+    }
 
     if(form){
       form.addEventListener('reset', function(){
