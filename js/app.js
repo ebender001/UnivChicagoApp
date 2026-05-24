@@ -18,6 +18,7 @@
     var target = document.querySelector('[data-site-header]');
     if(!target) return Promise.resolve();
 
+    // Header markup is shared so page-specific files do not duplicate navigation/auth controls.
     return fetch('partials/site-header.html')
       .then(function(response){
         if(!response.ok) throw new Error('Unable to load site header.');
@@ -126,6 +127,7 @@
       return Promise.reject(new Error('Login is required.'));
     }
 
+    // Authenticated CloudCode calls must include the stored Parse session token.
     return loadParseSdk().then(function(){
       if(!initializeParse()) throw new Error('Parse could not be loaded.');
 
@@ -219,6 +221,7 @@
   function updateHeaderVisibility(){
     var mainNav = document.querySelector('.main-nav');
     var authButton = document.querySelector('[data-auth-button]');
+    // Survey is a patient-facing flow, so dashboard navigation stays out of view there.
     var hideControls = isSurveyPage();
 
     if(mainNav) mainNav.hidden = hideControls;
@@ -233,6 +236,7 @@
     if(authButton) authButton.textContent = isLoggedIn ? 'Log Out' : 'Login';
 
     links.forEach(function(link){
+      // Public links stay available while dashboard-only links are gated until login.
       var isPublicLink = isPublicHref(link.getAttribute('href'));
       var isDisabled = !isLoggedIn && !isPublicLink;
       link.classList.toggle('is-disabled', isDisabled);
@@ -274,6 +278,7 @@
 
       ev.preventDefault();
       if(link.dataset.loginAlert){
+        // Some actions warn without opening the login dialog automatically.
         window.alert(link.dataset.loginAlert);
         return;
       }

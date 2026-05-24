@@ -2,6 +2,7 @@
 // Handles dashboard user invite creation.
 
 (function(){
+  // Order matters: each role may invite only its own role or lower-access roles.
   var roles = [
     {
       value: 'super_admin',
@@ -92,10 +93,12 @@
   }
 
   function hasEmailInvitationAccess(userRole){
+    // Viewer and data-entry users cannot manage dashboard invitations.
     return ['super_admin', 'study_admin', 'study_coordinator'].indexOf(userRole) !== -1;
   }
 
   function setSuperAdminSectionsVisible(visible){
+    // Client visibility mirrors CloudCode enforcement; server permissions remain authoritative.
     document.querySelectorAll('[data-super-admin-section]').forEach(function(section){
       section.hidden = !visible;
     });
@@ -172,6 +175,7 @@
   }
 
   function activationBaseUrl(){
+    // CloudCode appends the invite token to this page URL before sending the email.
     return new URL('accept-invite.html', window.location.href).href;
   }
 
@@ -207,6 +211,7 @@
         return;
       }
 
+      // Delete is a soft delete in CloudCode: Institution.isActive is set to false.
       button.disabled = true;
       window.BeFitMeAuth.runCloudFunction('deactivateInstitution', {
         institutionId: institution.objectId
@@ -238,6 +243,7 @@
         return;
       }
 
+      // Delete is a soft delete in CloudCode: _User.isActive is set to false.
       button.disabled = true;
       window.BeFitMeAuth.runCloudFunction('deactivateUser', {
         userId: user.objectId
@@ -266,6 +272,7 @@
         return;
       }
 
+      // Delete is a soft delete in CloudCode: Specialty.isActive is set to false.
       button.disabled = true;
       window.BeFitMeAuth.runCloudFunction('deactivateSpecialty', {
         specialtyId: specialty.objectId
@@ -430,6 +437,7 @@
         window.clearTimeout(panel.hideTimer);
         window.clearTimeout(panel.heightTimer);
 
+        // Animate from measured pixel heights, then release to auto for responsive content.
         if(expanded){
           panel.style.height = panel.offsetHeight + 'px';
           panel.offsetHeight;

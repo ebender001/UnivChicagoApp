@@ -36,6 +36,7 @@
     button.textContent = 'Continue Enrollment';
     button.setAttribute('aria-label', 'Continue enrollment for survey ' + survey.objectId);
     button.addEventListener('click', function(){
+      // Continue Enrollment carries the survey id so registration can create both pointers.
       window.location.href = 'enrollee-registration.html?surveyId=' + encodeURIComponent(survey.objectId);
     });
     cell.appendChild(button);
@@ -136,6 +137,7 @@
         window.clearTimeout(panel.hideTimer);
         window.clearTimeout(panel.heightTimer);
 
+        // Animate from measured pixel heights, then release to auto for responsive content.
         if(expanded){
           panel.style.height = panel.offsetHeight + 'px';
           panel.offsetHeight;

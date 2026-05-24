@@ -29,6 +29,7 @@
     button.className = kind === 'survey' ? 'btn table-action-button' : 'icon-button';
 
     if(kind === 'survey'){
+      // Linked enrollees show results; unlinked enrollees start a survey with their id in the URL.
       if(enrollee.fields && enrollee.fields.survey && enrollee.fields.survey.objectId){
         button.textContent = 'Survey Results';
         button.setAttribute('aria-label', 'View survey results for enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));

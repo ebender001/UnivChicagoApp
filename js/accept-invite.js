@@ -2,6 +2,7 @@
 // Activates a dashboard user invitation.
 
 (function(){
+  // This page is public, so it initializes Parse directly instead of using app.js auth state.
   var parseApplicationId = 'CGnMcyXItejbcFQgxtCM2suwgsmfN6oqK7EHg4FJ';
   var parseJavaScriptKey = 'fJSj7mSiQHB8CP1a6n1DWkVhwOEdGYHqsQ8AKvli';
   var parseServerURL = 'https://parseapi.back4app.com/';
@@ -53,6 +54,7 @@
   }
 
   function runActivation(params){
+    // Activation intentionally runs without a session token; the email token authorizes it.
     return loadParseSdk().then(function(){
       if(!initializeParse()) throw new Error('Parse could not be loaded.');
       return window.Parse.Cloud.run('activateDashboardUserInvite', params);
@@ -66,6 +68,7 @@
     var params = new URLSearchParams(window.location.search);
     var token = params.get('token');
     if(!token){
+      // The invite token is supplied only through the emailed activation link.
       form.hidden = true;
       showStatus('Invitation link is missing or invalid.', true);
       return;

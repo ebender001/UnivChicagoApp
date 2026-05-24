@@ -236,6 +236,7 @@
     var form = document.createElement('div');
     form.className = 'survey-form readonly-survey-form';
 
+    // Rebuild the survey in the original form order using CloudCode-normalized field names.
     var metadata = document.createElement('dl');
     metadata.className = 'readonly-grid survey-metadata';
     addReadonlyField(metadata, 'Survey ID', survey.objectId);

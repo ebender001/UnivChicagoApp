@@ -8,6 +8,7 @@
 
   var gaitTimers = {};
   var editingEnrolleeId = null;
+  // Edit mode preserves original measurement values because grip and gait are read-only later.
   var existingGaitValues = [];
   var existingGripValues = [];
   var existingGripCompleted = null;
@@ -81,6 +82,7 @@
     if(elapsedMs <= 0) return null;
 
     var seconds = elapsedMs / 1000;
+    // Store gait speed, not elapsed time: 4 meters divided by elapsed seconds.
     return Number((4 / seconds).toPrecision(2));
   }
 
@@ -247,6 +249,7 @@
     var popover = document.getElementById(popoverId);
     if(!helpButton || !popover) return;
 
+    // Move popovers to body so fixed positioning is not clipped by form sections.
     document.body.appendChild(popover);
 
     function setPopover(open){
@@ -307,15 +310,18 @@
     }
 
     if(editingEnrolleeId && existingGripValues.length){
+      // Disabled measurement inputs are omitted from FormData, so keep loaded originals.
       data.grip = existingGripValues.slice();
     }
 
     if(editingEnrolleeId && existingGaitValues.length){
+      // Gait values remain the original stored speeds during enrollee edits.
       data.gait = existingGaitValues.slice();
     }
 
     var params = new URLSearchParams(window.location.search);
     var surveyId = params.get('surveyId');
+    // Continue Enrollment arrives with a surveyId so CloudCode can link both records.
     if(surveyId) data.surveyId = surveyId;
     if(editingEnrolleeId) data.enrolleeId = editingEnrolleeId;
 
@@ -413,6 +419,7 @@
     if(submit) submit.textContent = 'Update';
     if(generateButton) generateButton.disabled = true;
 
+    // Existing enrollees can update registration details but not original test measurements.
     setFieldValue('enrollee-number', fields.enrolleeNumber);
     setFieldValue('start-date', formatDateInput(fields.startDate));
     setFieldValue('stop-date', formatDateInput(fields.stopDate));

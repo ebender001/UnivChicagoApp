@@ -13,6 +13,7 @@
 
     var params = new URLSearchParams(window.location.search);
     var enrolleeId = params.get('enrolleeId');
+    // Started-from-enrollee surveys pass this id so CloudCode can create the pointer link.
     if(enrolleeId) data.enrolleeId = enrolleeId;
 
     return data;
@@ -150,6 +151,7 @@
     function syncFollowUp(){
       var selected = document.querySelector('input[name="' + config.choiceName + '"]:checked');
       var showFollowUp = selected && selected.value === 'Yes';
+      // Follow-up answers are required only when the patient answered Yes.
       setSectionVisibility(followUp, Boolean(showFollowUp));
       setFollowUpRequired(config.followUpId, Boolean(showFollowUp));
       updateActivityRangeOutputs(config);
