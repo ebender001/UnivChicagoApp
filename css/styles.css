@@ -186,6 +186,21 @@ input:focus-visible{
 .success{ margin-top:1rem; padding:0.85rem; background:#e8f5ed; border:2px solid #8cc59d; border-radius:6px; color:#074f22; font-weight:700; }
 
 /* Admin */
+.admin-title-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.admin-title-row .page-title{ margin:0; }
+.link-button{
+  min-height:44px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--accent);
+  font:inherit;
+  font-weight:800;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.link-button:focus-visible{ outline:4px solid var(--focus); outline-offset:4px; }
+.my-info-button{ white-space:nowrap; }
 .admin-tool-card{ margin-top:1rem; padding:0; overflow:hidden; }
 .collapse-toggle{
   display:flex;
@@ -358,6 +373,54 @@ input:focus-visible{
 .survey-completion-panel h2{ margin:0; color:var(--accent); font-size:1.45rem; line-height:1.25; }
 .survey-completion-panel p{ margin:0; color:var(--text); font-size:1.05rem; }
 .survey-completion-panel .btn{ justify-self:center; min-width:120px; }
+
+/* PIN overlays */
+.pin-overlay{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  display:grid;
+  place-items:center;
+  padding:1.25rem;
+  background:rgba(11,11,11,0.42);
+}
+.pin-panel{
+  display:grid;
+  gap:1rem;
+  width:min(520px, 100%);
+  max-height:calc(100vh - 2.5rem);
+  overflow:auto;
+  padding:1.5rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:0 14px 34px rgba(0,0,0,0.22);
+}
+.pin-panel h2{ margin:0; color:var(--accent); font-size:1.45rem; line-height:1.25; }
+.pin-panel p{ margin:0; }
+.pin-display{
+  padding:0.7rem 1rem;
+  border:2px solid var(--accent);
+  border-radius:var(--radius);
+  background:#fff8f8;
+  color:var(--accent-dark);
+  font-size:2rem;
+  font-weight:800;
+  letter-spacing:0;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.pin-reminder{ color:var(--text); font-weight:800; }
+.my-info-list{ display:grid; gap:0.75rem; margin:0; }
+.my-info-list div{ padding:0.75rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fafafa; }
+.my-info-list dt{ margin:0 0 0.25rem; color:var(--muted); font-weight:800; font-size:0.9rem; }
+.my-info-list dd{ margin:0; word-break:break-word; }
+.generate-pin-link{ justify-self:start; }
+.pin-credential-form{ margin-top:0; }
+.pin-form-actions{ grid-template-columns:1fr; }
+.pin-result{ display:grid; gap:0.75rem; }
+.admin-list-section{ display:grid; gap:0.6rem; margin-top:1rem; }
+.admin-list-section h3{ margin:0; color:var(--accent); font-size:1rem; }
 
 /* Tables */
 .table-wrap{ overflow-x:auto; margin-top:1rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fff; }

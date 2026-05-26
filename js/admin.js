@@ -87,9 +87,35 @@
     if(status) status.textContent = message;
   }
 
+  function setActiveUserListStatus(message){
+    var status = document.getElementById('active-user-list-status');
+    if(status) status.textContent = message;
+  }
+
+  function setInactiveUserListStatus(message){
+    var status = document.getElementById('inactive-user-list-status');
+    if(status) status.textContent = message;
+  }
+
   function setSpecialtyListStatus(message){
     var status = document.getElementById('specialty-list-status');
     if(status) status.textContent = message;
+  }
+
+  function getProfileName(value){
+    if(!value) return '';
+    if(typeof value === 'string') return value.trim();
+    if(typeof value.name === 'string') return value.name.trim();
+    return '';
+  }
+
+  function escapeHtml(value){
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   function hasEmailInvitationAccess(userRole){
@@ -113,7 +139,9 @@
     });
 
     if(currentRoleIndex < 0 || currentRoleIndex > inviteAccessLimit) return [];
-    return roles.slice(currentRoleIndex);
+    return roles.slice(currentRoleIndex).filter(function(role){
+      return role.value !== 'super_admin';
+    });
   }
 
   function populateRoleOptions(user){
@@ -124,6 +152,8 @@
 
     var allowedRoles = allowedRolesFor(user && user.role);
     allowedRoles.forEach(function(role){
+      if(role.value === 'super_admin') return;
+
       var option = document.createElement('option');
       option.value = role.value;
       option.textContent = role.label + ' - ' + role.description;
@@ -315,9 +345,9 @@
     wrap.hidden = !institutions.length;
   }
 
-  function renderUsers(users){
-    var body = document.getElementById('users-list-body');
-    var wrap = document.getElementById('users-list-wrap');
+  function renderUsers(users, options){
+    var body = document.getElementById(options.bodyId);
+    var wrap = document.getElementById(options.wrapId);
     if(!body || !wrap) return;
 
     body.textContent = '';
@@ -332,12 +362,14 @@
       nameCell.textContent = user.name;
       institutionCell.textContent = user.institutionName || '';
       specialtyCell.textContent = user.specialtyName || '';
-      actionCell.appendChild(createUserDeleteButton(user));
 
       row.appendChild(nameCell);
       row.appendChild(institutionCell);
       row.appendChild(specialtyCell);
-      row.appendChild(actionCell);
+      if(options.showDelete){
+        actionCell.appendChild(createUserDeleteButton(user));
+        row.appendChild(actionCell);
+      }
       body.appendChild(row);
     });
 
@@ -399,8 +431,27 @@
 
     return window.BeFitMeAuth.runCloudFunction('listUsers').then(function(result){
       var users = result && result.results ? result.results : [];
-      renderUsers(users);
-      setUserListStatus(users.length ? '' : 'No active users found.');
+      var activeUsers = users.filter(function(listUser){
+        return listUser.isActive === true;
+      });
+      var inactiveUsers = users.filter(function(listUser){
+        return listUser.isActive !== true;
+      });
+
+      renderUsers(activeUsers, {
+        bodyId: 'active-users-list-body',
+        wrapId: 'active-users-list-wrap',
+        showDelete: true
+      });
+      renderUsers(inactiveUsers, {
+        bodyId: 'inactive-users-list-body',
+        wrapId: 'inactive-users-list-wrap',
+        showDelete: false
+      });
+
+      setUserListStatus(users.length ? '' : 'No users found.');
+      setActiveUserListStatus(activeUsers.length ? '' : 'No active users found.');
+      setInactiveUserListStatus(inactiveUsers.length ? '' : 'No inactive users found.');
     }).catch(function(error){
       console.log('Unable to load users:', error);
       setUserListStatus(error && error.message ? error.message : 'Unable to load users.');
@@ -471,6 +522,180 @@
           }, 300);
         });
       });
+    });
+  }
+
+  function closeMyInfoOverlay(){
+    var overlay = document.getElementById('my-info-overlay');
+    if(overlay) overlay.remove();
+  }
+
+  function showGeneratedPin(pin){
+    var result = document.getElementById('my-info-pin-result');
+    if(!result) return;
+
+    result.innerHTML = [
+      '<p>Your new PIN is:</p>',
+      '<div class="pin-display">' + escapeHtml(pin) + '</div>',
+      '<p class="pin-reminder">Please remember this PIN. It will be needed for Watch app admin login.</p>'
+    ].join('');
+    result.hidden = false;
+  }
+
+  function setPinSubmitState(form, saving){
+    var submit = form.querySelector('[type="submit"]');
+    if(!submit) return;
+
+    submit.disabled = saving;
+    submit.textContent = saving ? 'Generating...' : 'Generate New PIN';
+  }
+
+  function showMyInfoStatus(message, isError){
+    var status = document.getElementById('my-info-status');
+    if(!status) return;
+
+    status.textContent = message;
+    status.hidden = false;
+    status.classList.toggle('form-error', Boolean(isError));
+    status.classList.toggle('success', !isError);
+  }
+
+  function requestPasswordReset(button){
+    if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+      showMyInfoStatus('Login is not ready. Please refresh and try again.', true);
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Sending password reset...';
+
+    window.BeFitMeAuth.runCloudFunction('requestDashboardPasswordReset').then(function(result){
+      console.log('Password reset requested:', result);
+      showMyInfoStatus('Password reset email sent to ' + (result && result.email ? result.email : 'your email address') + '.', false);
+    }).catch(function(error){
+      console.log('Password reset request failed:', error);
+      showMyInfoStatus(error && error.message ? error.message : 'Unable to send password reset email.', true);
+    }).finally(function(){
+      button.disabled = false;
+      button.textContent = 'Restore password';
+    });
+  }
+
+  function createMyInfoOverlay(){
+    var user = getStoredCurrentUser();
+    var institutionName = getProfileName(user && user.institution) || 'Not set';
+    var specialtyName = getProfileName(user && user.specialty) || 'Not set';
+    var username = user && user.username ? user.username : '';
+    var overlay = document.createElement('div');
+
+    overlay.id = 'my-info-overlay';
+    overlay.className = 'pin-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'my-info-title');
+    overlay.innerHTML = [
+      '<div class="pin-panel my-info-panel">',
+      '<h2 id="my-info-title">My Info</h2>',
+      '<dl class="my-info-list">',
+      '<div><dt>Institution</dt><dd>' + escapeHtml(institutionName) + '</dd></div>',
+      '<div><dt>Specialty</dt><dd>' + escapeHtml(specialtyName) + '</dd></div>',
+      '</dl>',
+      '<button type="button" class="link-button generate-pin-link" id="request-password-reset">Restore password</button>',
+      '<button type="button" class="link-button generate-pin-link" id="show-generate-pin-form">Generate a new PIN</button>',
+      '<form id="generate-pin-form" class="survey-form pin-credential-form" hidden>',
+      '<div class="form-row">',
+      '<label for="pin-username">Username or Email</label>',
+      '<input type="text" id="pin-username" name="username" autocomplete="username" value="' + escapeHtml(username) + '" required />',
+      '</div>',
+      '<div class="form-row">',
+      '<label for="pin-password">Password</label>',
+      '<input type="password" id="pin-password" name="password" autocomplete="current-password" required />',
+      '</div>',
+      '<div class="form-actions pin-form-actions">',
+      '<button type="submit" class="btn primary">Generate New PIN</button>',
+      '</div>',
+      '</form>',
+      '<div id="my-info-pin-result" class="pin-result" hidden></div>',
+      '<div id="my-info-status" role="status" aria-live="polite" hidden></div>',
+      '<button type="button" class="btn" id="close-my-info">Close</button>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+  }
+
+  function setupMyInfoOverlay(){
+    var button = document.getElementById('my-info-button');
+    if(!button) return;
+
+    button.addEventListener('click', function(){
+      if(!hasActiveLogin()){
+        window.alert('Please log in to view your information.');
+        return;
+      }
+
+      createMyInfoOverlay();
+
+      var overlay = document.getElementById('my-info-overlay');
+      var showForm = document.getElementById('show-generate-pin-form');
+      var passwordReset = document.getElementById('request-password-reset');
+      var form = document.getElementById('generate-pin-form');
+      var close = document.getElementById('close-my-info');
+
+      if(close) close.addEventListener('click', closeMyInfoOverlay);
+      if(overlay){
+        overlay.addEventListener('click', function(ev){
+          if(ev.target === overlay) closeMyInfoOverlay();
+        });
+      }
+
+      if(showForm && form){
+        showForm.addEventListener('click', function(){
+          form.hidden = false;
+          showForm.hidden = true;
+          var password = document.getElementById('pin-password');
+          if(password) password.focus();
+        });
+      }
+
+      if(passwordReset){
+        passwordReset.addEventListener('click', function(){
+          requestPasswordReset(passwordReset);
+        });
+      }
+
+      if(form){
+        form.addEventListener('submit', function(ev){
+          ev.preventDefault();
+
+          if(!form.checkValidity()){
+            form.reportValidity();
+            return;
+          }
+
+          var username = document.getElementById('pin-username').value.trim();
+          var password = document.getElementById('pin-password').value;
+          setPinSubmitState(form, true);
+
+          window.BeFitMeAuth.runCloudFunction('generateDashboardUserPIN', {
+            username: username,
+            password: password
+          }).then(function(result){
+            console.log('Dashboard user PIN generated:', result);
+            form.reset();
+            form.hidden = true;
+            if(showForm) showForm.hidden = false;
+            showGeneratedPin(result && result.pin);
+            var closeButton = document.getElementById('close-my-info');
+            if(closeButton) closeButton.focus();
+          }).catch(function(error){
+            console.log('Dashboard user PIN generation failed:', error);
+            showMyInfoStatus(error && error.message ? error.message : 'Unable to generate PIN.', true);
+          }).finally(function(){
+            setPinSubmitState(form, false);
+          });
+        });
+      }
     });
   }
 
@@ -625,6 +850,7 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     setupCollapsibleSections();
+    setupMyInfoOverlay();
     setupInviteForm();
     setupInstitutionForm();
     setupSpecialtyForm();

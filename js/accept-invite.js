@@ -61,6 +61,33 @@
     });
   }
 
+  function showNewUserPinOverlay(pin){
+    var overlay = document.createElement('div');
+    overlay.className = 'pin-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'new-user-pin-title');
+    overlay.innerHTML = [
+      '<div class="pin-panel">',
+      '<h2 id="new-user-pin-title">New User PIN</h2>',
+      '<p>Your watch app PIN is:</p>',
+      '<div class="pin-display">' + pin + '</div>',
+      '<p class="pin-reminder">Please remember this PIN. It will be needed for Watch app admin login.</p>',
+      '<button type="button" class="btn primary" id="new-user-pin-ok">OK</button>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+
+    var okButton = document.getElementById('new-user-pin-ok');
+    if(okButton){
+      okButton.focus();
+      okButton.addEventListener('click', function(){
+        overlay.remove();
+      });
+    }
+  }
+
   function setupInviteForm(){
     var form = document.getElementById('accept-invite-form');
     if(!form) return;
@@ -86,6 +113,7 @@
       var password = document.getElementById('invite-password').value;
       var confirm = document.getElementById('invite-password-confirm').value;
 
+      // Confirm locally before activating so mismatched passwords never reach CloudCode.
       if(password !== confirm){
         showStatus('Passwords do not match.', true);
         return;
@@ -102,6 +130,7 @@
         form.reset();
         form.hidden = true;
         showStatus('Your account has been activated. You can now log in.', false);
+        if(result && result.pin) showNewUserPinOverlay(result.pin);
       }).catch(function(error){
         console.log('Invitation activation failed:', error);
         showStatus(error && error.message ? error.message : 'Unable to activate account.', true);
