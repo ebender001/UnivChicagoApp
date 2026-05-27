@@ -479,6 +479,43 @@
   }
 
   function setupCollapsibleSections(){
+    function closePanel(button, panel){
+      window.clearTimeout(panel.hideTimer);
+      window.clearTimeout(panel.heightTimer);
+
+      panel.style.height = panel.offsetHeight + 'px';
+      panel.offsetHeight;
+      button.setAttribute('aria-expanded', 'false');
+      panel.classList.remove('is-visible');
+
+      window.requestAnimationFrame(function(){
+        panel.style.height = '0px';
+        panel.hideTimer = window.setTimeout(function(){
+          if(!panel.classList.contains('is-visible')){
+            panel.hidden = true;
+            panel.style.height = '';
+          }
+        }, 300);
+      });
+    }
+
+    function openPanel(button, panel){
+      panel.hidden = false;
+      panel.classList.remove('is-visible');
+      panel.style.height = '0px';
+      button.setAttribute('aria-expanded', 'true');
+
+      window.requestAnimationFrame(function(){
+        panel.classList.add('is-visible');
+        panel.style.height = panel.scrollHeight + 'px';
+        panel.heightTimer = window.setTimeout(function(){
+          if(panel.classList.contains('is-visible')){
+            panel.style.height = 'auto';
+          }
+        }, 300);
+      });
+    }
+
     document.querySelectorAll('[data-collapse-toggle]').forEach(function(button){
       var panel = document.getElementById(button.getAttribute('aria-controls'));
       if(!panel) return;
@@ -490,37 +527,18 @@
 
         // Animate from measured pixel heights, then release to auto for responsive content.
         if(expanded){
-          panel.style.height = panel.offsetHeight + 'px';
-          panel.offsetHeight;
-          button.setAttribute('aria-expanded', 'false');
-          panel.classList.remove('is-visible');
-
-          window.requestAnimationFrame(function(){
-            panel.style.height = '0px';
-            panel.hideTimer = window.setTimeout(function(){
-              if(!panel.classList.contains('is-visible')){
-                panel.hidden = true;
-                panel.style.height = '';
-              }
-            }, 300);
-          });
+          closePanel(button, panel);
           return;
         }
 
-        panel.hidden = false;
-        panel.classList.remove('is-visible');
-        panel.style.height = '0px';
-        button.setAttribute('aria-expanded', 'true');
-
-        window.requestAnimationFrame(function(){
-          panel.classList.add('is-visible');
-          panel.style.height = panel.scrollHeight + 'px';
-          panel.heightTimer = window.setTimeout(function(){
-            if(panel.classList.contains('is-visible')){
-              panel.style.height = 'auto';
-            }
-          }, 300);
+        document.querySelectorAll('[data-collapse-toggle][aria-expanded="true"]').forEach(function(otherButton){
+          var otherPanel = document.getElementById(otherButton.getAttribute('aria-controls'));
+          if(otherButton !== button && otherPanel && !otherPanel.hidden){
+            closePanel(otherButton, otherPanel);
+          }
         });
+
+        openPanel(button, panel);
       });
     });
   }

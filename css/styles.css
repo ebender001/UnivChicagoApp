@@ -421,6 +421,9 @@ input:focus-visible{
 .pin-result{ display:grid; gap:0.75rem; }
 .admin-list-section{ display:grid; gap:0.6rem; margin-top:1rem; }
 .admin-list-section h3{ margin:0; color:var(--accent); font-size:1rem; }
+.inactive-users-table{ color:var(--muted); background:#f7f7f7; }
+.inactive-users-table th{ color:#777777; background:#f1f1f1; }
+.inactive-users-table td{ color:#777777; }
 
 /* Tables */
 .table-wrap{ overflow-x:auto; margin-top:1rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fff; }
