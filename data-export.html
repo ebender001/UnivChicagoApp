@@ -14,10 +14,30 @@
       <section class="card">
         <h1 class="page-title">Data Export</h1>
         <p class="lead">Choose the data set to export.</p>
+        <fieldset class="export-format-selector">
+          <legend>File Format</legend>
+          <label class="choice" title="CSV is best for opening data in spreadsheet apps like Excel, Numbers, or Google Sheets.">
+            <input type="radio" name="exportFormat" value="csv" aria-describedby="csv-format-help" checked />
+            <span>CSV</span>
+          </label>
+          <label class="choice" title="JSON is useful for software integrations, APIs, data pipelines, and preserving structured data.">
+            <input type="radio" name="exportFormat" value="json" aria-describedby="json-format-help" />
+            <span>JSON</span>
+          </label>
+          <span id="csv-format-help" class="sr-only">CSV is best for opening data in spreadsheet apps like Excel, Numbers, or Google Sheets.</span>
+          <span id="json-format-help" class="sr-only">JSON is useful for software integrations, APIs, data pipelines, and preserving structured data.</span>
+        </fieldset>
         <div class="data-export-actions">
           <button type="button" class="btn primary" id="download-survey-data">Survey Data</button>
           <button type="button" class="btn primary">Frailty Scores</button>
-          <button type="button" class="btn primary">Activity Data</button>
+          <button type="button" class="btn primary" id="show-activity-options">Activity Data</button>
+        </div>
+        <div id="activity-export-options" class="data-export-option-panel" hidden>
+          <button type="button" class="btn" data-activity-export="combined">One Activity File</button>
+          <button type="button" class="btn" data-activity-export="separate">HR, Pedometer, and Exercise ZIP</button>
+          <button type="button" class="btn" data-activity-export="heartRate">Heart Rate Only</button>
+          <button type="button" class="btn" data-activity-export="pedometer">Pedometer Only</button>
+          <button type="button" class="btn" data-activity-export="exercise">Exercise Only</button>
         </div>
         <div id="data-export-status" role="status" aria-live="polite" hidden></div>
       </section>
