@@ -32,7 +32,7 @@
   ];
 
   function getStoredCurrentUser(){
-    var stored = window.localStorage.getItem('befitmeCurrentUser') || window.localStorage.getItem('currentUser');
+    var stored = window.sessionStorage.getItem('befitmeCurrentUser') || window.sessionStorage.getItem('currentUser');
     if(!stored) return null;
 
     try{
@@ -44,7 +44,7 @@
 
   function hasActiveLogin(){
     var user = getStoredCurrentUser();
-    return window.localStorage.getItem('befitmeLoggedIn') === 'true' && Boolean(user && user.sessionToken);
+    return window.sessionStorage.getItem('befitmeLoggedIn') === 'true' && Boolean(user && user.sessionToken);
   }
 
   function showStatus(message, isError){

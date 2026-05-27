@@ -13,7 +13,13 @@
     <main id="main-content" class="container">
       <section class="card">
         <h1 class="page-title">Data Export</h1>
-        <p class="lead">Export tools will be added here.</p>
+        <p class="lead">Choose the data set to export.</p>
+        <div class="data-export-actions">
+          <button type="button" class="btn primary" id="download-survey-data">Survey Data</button>
+          <button type="button" class="btn primary">Frailty Scores</button>
+          <button type="button" class="btn primary">Activity Data</button>
+        </div>
+        <div id="data-export-status" role="status" aria-live="polite" hidden></div>
       </section>
     </main>
 
@@ -22,5 +28,6 @@
     </footer>
 
     <script src="js/app.js"></script>
+    <script src="js/data-export.js"></script>
   </body>
 </html>

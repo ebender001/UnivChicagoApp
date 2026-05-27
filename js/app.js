@@ -8,6 +8,11 @@
   var parseServerURL = 'https://parseapi.back4app.com/';
   var parseSdkURL = 'https://npmcdn.com/parse/dist/parse.min.js';
   var parseSdkPromise = null;
+  var inactivityWarningDelayMs = 20 * 60 * 1000;
+  var inactivityLogoutGraceMs = 60 * 1000;
+  var inactivityTimer = null;
+  var inactivityLogoutTimer = null;
+  var inactivityEvents = ['click', 'keydown', 'mousemove', 'touchstart', 'scroll'];
 
   function setYear(elementId){
     var el = document.getElementById(elementId);
@@ -33,7 +38,7 @@
   }
 
   function getStoredCurrentUser(){
-    var stored = window.localStorage.getItem(currentUserStorageKey) || window.localStorage.getItem(legacyCurrentUserStorageKey);
+    var stored = window.sessionStorage.getItem(currentUserStorageKey) || window.sessionStorage.getItem(legacyCurrentUserStorageKey);
     if(!stored) return null;
 
     try{
@@ -69,25 +74,34 @@
   }
 
   function clearLoginState(){
+    window.sessionStorage.removeItem(loginStorageKey);
+    window.sessionStorage.removeItem(currentUserStorageKey);
+    window.sessionStorage.removeItem(legacyCurrentUserStorageKey);
     window.localStorage.removeItem(loginStorageKey);
     window.localStorage.removeItem(currentUserStorageKey);
     window.localStorage.removeItem(legacyCurrentUserStorageKey);
+    stopInactivityTimer();
+    closeSessionTimeoutOverlay();
     updateHeaderProfile(null);
   }
 
   function applyLoginResult(result){
     if(!result) return;
 
-    window.localStorage.setItem(loginStorageKey, 'true');
-    window.localStorage.setItem(currentUserStorageKey, JSON.stringify(result));
-    window.localStorage.setItem(legacyCurrentUserStorageKey, JSON.stringify(result));
+    window.sessionStorage.setItem(loginStorageKey, 'true');
+    window.sessionStorage.setItem(currentUserStorageKey, JSON.stringify(result));
+    window.sessionStorage.setItem(legacyCurrentUserStorageKey, JSON.stringify(result));
+    window.localStorage.removeItem(loginStorageKey);
+    window.localStorage.removeItem(currentUserStorageKey);
+    window.localStorage.removeItem(legacyCurrentUserStorageKey);
     updateHeaderProfile(result);
     updateAuthState();
+    resetInactivityTimer();
   }
 
   function hasActiveLogin(){
     var user = getStoredCurrentUser();
-    return window.localStorage.getItem(loginStorageKey) === 'true' && !!(user && user.sessionToken);
+    return window.sessionStorage.getItem(loginStorageKey) === 'true' && !!(user && user.sessionToken);
   }
 
   function loadParseSdk(){
@@ -194,6 +208,87 @@
     document.body.classList.remove('login-required');
   }
 
+  function redirectAfterLogout(){
+    if(!location.pathname.endsWith('index.html') && !location.pathname.endsWith('/')){
+      window.location.href = 'index.html';
+    }
+  }
+
+  function logoutUser(options){
+    clearLoginState();
+    closeLogin();
+    updateAuthState();
+    console.log('Logout successful');
+    if(options && options.redirect) redirectAfterLogout();
+  }
+
+  function createSessionTimeoutOverlay(){
+    var wrapper = document.createElement('div');
+    wrapper.id = 'session-timeout-overlay';
+    wrapper.className = 'login-overlay session-timeout-overlay';
+    wrapper.setAttribute('role', 'dialog');
+    wrapper.setAttribute('aria-modal', 'true');
+    wrapper.setAttribute('aria-labelledby', 'session-timeout-title');
+    wrapper.hidden = true;
+    wrapper.innerHTML = [
+      '<div class="login-panel session-timeout-panel">',
+      '<h2 id="session-timeout-title">Session timeout</h2>',
+      '<p>Your session will time out and you will be logged out.</p>',
+      '<div class="login-actions">',
+      '<button type="button" class="btn primary" data-stay-connected>Stay Connected</button>',
+      '<button type="button" class="btn" data-timeout-logout>Log Out</button>',
+      '</div>',
+      '</div>'
+    ].join('');
+    document.body.appendChild(wrapper);
+  }
+
+  function ensureSessionTimeoutOverlay(){
+    if(!document.getElementById('session-timeout-overlay')) createSessionTimeoutOverlay();
+  }
+
+  function closeSessionTimeoutOverlay(){
+    var overlay = document.getElementById('session-timeout-overlay');
+    if(overlay) overlay.hidden = true;
+    window.clearTimeout(inactivityLogoutTimer);
+    inactivityLogoutTimer = null;
+  }
+
+  function showSessionTimeoutOverlay(){
+    if(!hasActiveLogin()) return;
+    ensureSessionTimeoutOverlay();
+
+    var overlay = document.getElementById('session-timeout-overlay');
+    var stayConnected = overlay ? overlay.querySelector('[data-stay-connected]') : null;
+    if(!overlay) return;
+
+    overlay.hidden = false;
+    if(stayConnected) stayConnected.focus();
+
+    window.clearTimeout(inactivityLogoutTimer);
+    inactivityLogoutTimer = window.setTimeout(function(){
+      logoutUser({ redirect: true });
+    }, inactivityLogoutGraceMs);
+  }
+
+  function stopInactivityTimer(){
+    window.clearTimeout(inactivityTimer);
+    window.clearTimeout(inactivityLogoutTimer);
+    inactivityTimer = null;
+    inactivityLogoutTimer = null;
+  }
+
+  function resetInactivityTimer(){
+    if(!hasActiveLogin()){
+      stopInactivityTimer();
+      return;
+    }
+
+    closeSessionTimeoutOverlay();
+    window.clearTimeout(inactivityTimer);
+    inactivityTimer = window.setTimeout(showSessionTimeoutOverlay, inactivityWarningDelayMs);
+  }
+
   function setupActiveNav(){
     var links = document.querySelectorAll('.main-nav a');
     var path = location.pathname;
@@ -255,13 +350,7 @@
           return;
         }
 
-        clearLoginState();
-        closeLogin();
-        updateAuthState();
-        console.log('Logout successful');
-        if(!location.pathname.endsWith('index.html') && !location.pathname.endsWith('/')){
-          window.location.href = 'index.html';
-        }
+        logoutUser({ redirect: true });
         return;
       }
 
@@ -348,6 +437,34 @@
     });
   }
 
+  function setupInactivityLogout(){
+    ensureSessionTimeoutOverlay();
+
+    inactivityEvents.forEach(function(eventName){
+      document.addEventListener(eventName, function(){
+        var overlay = document.getElementById('session-timeout-overlay');
+        if(overlay && !overlay.hidden) return;
+        resetInactivityTimer();
+      }, { passive: true });
+    });
+
+    document.addEventListener('click', function(ev){
+      var stayConnected = ev.target.closest('[data-stay-connected]');
+      var timeoutLogout = ev.target.closest('[data-timeout-logout]');
+
+      if(stayConnected){
+        resetInactivityTimer();
+        return;
+      }
+
+      if(timeoutLogout){
+        logoutUser({ redirect: true });
+      }
+    });
+
+    resetInactivityTimer();
+  }
+
   window.BeFitMeAuth = {
     applyLoginResult: applyLoginResult,
     updateHeaderProfile: updateHeaderProfile,
@@ -356,11 +473,15 @@
   };
 
   document.addEventListener('DOMContentLoaded', function(){
+    window.localStorage.removeItem(loginStorageKey);
+    window.localStorage.removeItem(currentUserStorageKey);
+    window.localStorage.removeItem(legacyCurrentUserStorageKey);
     setYear('year');
     setYear('year-2');
     setYear('year-3');
     setupNavigationGate();
     setupLoginGate();
+    setupInactivityLogout();
     loadSiteHeader().then(function(){
       setupActiveNav();
       updateHeaderProfile(getStoredCurrentUser());
