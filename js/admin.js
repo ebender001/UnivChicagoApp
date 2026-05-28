@@ -532,27 +532,6 @@
     status.classList.toggle('success', !isError);
   }
 
-  function requestPasswordReset(button){
-    if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
-      showMyInfoStatus('Login is not ready. Please refresh and try again.', true);
-      return;
-    }
-
-    button.disabled = true;
-    button.textContent = 'Sending password reset...';
-
-    window.BeFitMeAuth.runCloudFunction('requestDashboardPasswordReset').then(function(result){
-      console.log('Password reset requested:', result);
-      showMyInfoStatus('Password reset email sent to ' + (result && result.email ? result.email : 'your email address') + '.', false);
-    }).catch(function(error){
-      console.log('Password reset request failed:', error);
-      showMyInfoStatus(error && error.message ? error.message : 'Unable to send password reset email.', true);
-    }).finally(function(){
-      button.disabled = false;
-      button.textContent = 'Restore password';
-    });
-  }
-
   function createMyInfoOverlay(){
     var user = getStoredCurrentUser();
     var institutionName = getProfileName(user && user.institution) || 'Not set';
@@ -572,9 +551,7 @@
       '<div><dt>Institution</dt><dd>' + escapeHtml(institutionName) + '</dd></div>',
       '<div><dt>Specialty</dt><dd>' + escapeHtml(specialtyName) + '</dd></div>',
       '</dl>',
-      '<button type="button" class="link-button generate-pin-link" id="request-password-reset">Restore password</button>',
-      '<button type="button" class="link-button generate-pin-link" id="show-generate-pin-form">Generate a new PIN</button>',
-      '<form id="generate-pin-form" class="survey-form pin-credential-form" hidden>',
+      '<form id="generate-pin-form" class="survey-form pin-credential-form">',
       '<div class="form-row">',
       '<label for="pin-username">Username or Email</label>',
       '<input type="text" id="pin-username" name="username" autocomplete="username" value="' + escapeHtml(username) + '" required />',
@@ -609,8 +586,6 @@
       createMyInfoOverlay();
 
       var overlay = document.getElementById('my-info-overlay');
-      var showForm = document.getElementById('show-generate-pin-form');
-      var passwordReset = document.getElementById('request-password-reset');
       var form = document.getElementById('generate-pin-form');
       var close = document.getElementById('close-my-info');
 
@@ -618,21 +593,6 @@
       if(overlay){
         overlay.addEventListener('click', function(ev){
           if(ev.target === overlay) closeMyInfoOverlay();
-        });
-      }
-
-      if(showForm && form){
-        showForm.addEventListener('click', function(){
-          form.hidden = false;
-          showForm.hidden = true;
-          var password = document.getElementById('pin-password');
-          if(password) password.focus();
-        });
-      }
-
-      if(passwordReset){
-        passwordReset.addEventListener('click', function(){
-          requestPasswordReset(passwordReset);
         });
       }
 
@@ -656,7 +616,6 @@
             console.log('Dashboard user PIN generated:', result);
             form.reset();
             form.hidden = true;
-            if(showForm) showForm.hidden = false;
             showGeneratedPin(result && result.pin);
             var closeButton = document.getElementById('close-my-info');
             if(closeButton) closeButton.focus();
