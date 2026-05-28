@@ -462,6 +462,61 @@ input:focus-visible{
 .detail-section{ margin-top:1.25rem; }
 .detail-section h2{ margin:0 0 0.75rem; color:var(--accent); font-size:1.15rem; }
 .score-placeholder{ margin:0; font-size:1.25rem; font-weight:800; }
+.frailty-score-wrap{ max-width:760px; }
+.frailty-score-table{ min-width:0; }
+.frailty-score-table th,
+.frailty-score-table td{ width:50%; }
+.frailty-score-table th{ color:var(--text); }
+.frailty-total-row th,
+.frailty-total-row td{ font-size:1.1rem; font-weight:800; }
+.frailty-assessment-row th,
+.frailty-assessment-row td{
+  background:var(--accent);
+  color:#fff;
+  font-weight:800;
+}
+.frailty-key-row th,
+.frailty-key-row td{ color:var(--muted); font-size:0.95rem; }
+.frailty-separator-row td{
+  height:12px;
+  padding:0;
+  border-bottom:4px solid var(--accent);
+  background:#fff;
+}
+.frailty-detail-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  min-height:36px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  font:inherit;
+  font-weight:800;
+  text-align:left;
+}
+.frailty-detail-toggle .collapse-indicator{ color:var(--text); font-size:1.25rem; }
+.frailty-detail-toggle[aria-expanded="true"] .collapse-indicator{ transform:rotate(45deg); }
+.frailty-detail-toggle:focus-visible{ outline:4px solid var(--focus); outline-offset:4px; }
+.frailty-detail-row td{ padding:0; background:#fafafa; border-bottom:0; }
+.frailty-detail-panel{
+  height:0;
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(-6px);
+  transition:height 280ms ease, opacity 220ms ease, transform 280ms ease;
+}
+.frailty-detail-row.is-visible .frailty-detail-panel{
+  opacity:1;
+  transform:translateY(0);
+}
+.frailty-detail-list{ display:grid; gap:0.75rem; margin:0; }
+.frailty-detail-panel .frailty-detail-list{ padding:0.85rem 0.75rem 1rem; border-bottom:1px solid #dddddd; }
+.frailty-detail-list div{ display:grid; gap:0.2rem; }
+.frailty-detail-list dt{ color:var(--muted); font-weight:800; font-size:0.9rem; }
+.frailty-detail-list dd{ margin:0; }
 .readonly-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:0.75rem; }
 .readonly-field{ padding:0.75rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fafafa; }
 .readonly-field dt{ margin:0 0 0.25rem; color:var(--muted); font-weight:800; font-size:0.9rem; }

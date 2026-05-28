@@ -205,10 +205,7 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     setupDownload('download-survey-data', 'downloadSurveyData', 'Survey Data', 'Survey data exported.', 'survey-data.csv');
-    var frailtyButton = document.querySelector('.data-export-actions .btn:nth-child(2)');
-    if(frailtyButton){
-      frailtyButton.addEventListener('click', closeActivityOptions);
-    }
+    setupDownload('download-frailty-scores', 'downloadFrailtyScores', 'Frailty Scores', 'Frailty scores exported.', 'frailty-scores.csv');
     setupActivityOptions();
   });
 })();
