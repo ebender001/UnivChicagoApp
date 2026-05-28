@@ -2,35 +2,6 @@
 // Handles dashboard user invite creation.
 
 (function(){
-  // Order matters: each role may invite only its own role or lower-access roles.
-  var roles = [
-    {
-      value: 'super_admin',
-      label: 'Super Admin',
-      description: 'Full system access across all institutions.'
-    },
-    {
-      value: 'study_admin',
-      label: 'Study Admin',
-      description: 'Full access within one institution/study.'
-    },
-    {
-      value: 'study_coordinator',
-      label: 'Study Coordinator',
-      description: 'Operational access: patients, surveys, watch registration, uploads.'
-    },
-    {
-      value: 'data_entry',
-      label: 'Data Entry',
-      description: 'Can enter/edit patient and survey data, but cannot manage users or exports.'
-    },
-    {
-      value: 'viewer',
-      label: 'Viewer',
-      description: 'Read-only access within their institution/study.'
-    }
-  ];
-
   function getStoredCurrentUser(){
     var stored = window.sessionStorage.getItem('befitmeCurrentUser') || window.sessionStorage.getItem('currentUser');
     if(!stored) return null;
@@ -118,11 +89,6 @@
       .replace(/'/g, '&#039;');
   }
 
-  function hasEmailInvitationAccess(userRole){
-    // Viewer and data-entry users cannot manage dashboard invitations.
-    return ['super_admin', 'study_admin', 'study_coordinator'].indexOf(userRole) !== -1;
-  }
-
   function setSuperAdminSectionsVisible(visible){
     // Client visibility mirrors CloudCode enforcement; server permissions remain authoritative.
     document.querySelectorAll('[data-super-admin-section]').forEach(function(section){
@@ -130,37 +96,20 @@
     });
   }
 
-  function allowedRolesFor(userRole){
-    var currentRoleIndex = roles.findIndex(function(role){
-      return role.value === userRole;
-    });
-    var inviteAccessLimit = roles.findIndex(function(role){
-      return role.value === 'study_coordinator';
-    });
-
-    if(currentRoleIndex < 0 || currentRoleIndex > inviteAccessLimit) return [];
-    return roles.slice(currentRoleIndex).filter(function(role){
-      return role.value !== 'super_admin';
-    });
-  }
-
-  function populateRoleOptions(user){
+  function populateRoleOptions(roles){
     var roleSelect = document.getElementById('invite-role');
     if(!roleSelect) return false;
 
     roleSelect.textContent = '';
 
-    var allowedRoles = allowedRolesFor(user && user.role);
-    allowedRoles.forEach(function(role){
-      if(role.value === 'super_admin') return;
-
+    (roles || []).forEach(function(role){
       var option = document.createElement('option');
-      option.value = role.value;
-      option.textContent = role.label + ' - ' + role.description;
+      option.value = role.name;
+      option.textContent = role.displayName + (role.description ? ' - ' + role.description : '');
       roleSelect.appendChild(option);
     });
 
-    return allowedRoles.length > 0;
+    return roleSelect.options.length > 0;
   }
 
   function populateNamedOptions(selectId, options){
@@ -217,8 +166,13 @@
     showStatus('Loading invite options...', false);
 
     return window.BeFitMeAuth.runCloudFunction('listInviteOptions').then(function(result){
+      var hasRoles = populateRoleOptions(result && result.roles);
       var hasInstitutions = populateNamedOptions('invite-institution', result && result.institutions);
       var hasSpecialties = populateNamedOptions('invite-specialty', result && result.specialties);
+
+      if(!hasRoles){
+        throw new Error('Your account role cannot invite dashboard users.');
+      }
 
       if(!hasInstitutions || !hasSpecialties){
         throw new Error('Institution and specialty options are required before inviting users.');
@@ -729,21 +683,9 @@
       return;
     }
 
-    if(!hasEmailInvitationAccess(user && user.role)){
-      if(card) card.hidden = true;
-      return;
-    }
-
-    if(!populateRoleOptions(user)){
-      if(card) card.hidden = true;
-      showStatus(user && user.role === 'viewer'
-        ? 'Viewer accounts cannot invite dashboard users.'
-        : 'Your account role could not be confirmed. Please log out and log back in before inviting dashboard users.', true);
-      return;
-    }
-
     loadInviteOptions().catch(function(error){
       form.hidden = true;
+      if(card) card.hidden = true;
       showStatus(error && error.message ? error.message : 'Unable to load invite options.', true);
     });
 
