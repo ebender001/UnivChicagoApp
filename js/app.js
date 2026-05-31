@@ -156,6 +156,15 @@
     }
   }
 
+  function getStoredUserRole(){
+    var user = getStoredCurrentUser();
+    return user && typeof user.role === 'string' ? user.role.trim().toLowerCase() : '';
+  }
+
+  function isViewerRole(){
+    return getStoredUserRole() === 'viewer';
+  }
+
   function getProfileName(value){
     if(!value) return '';
     if(typeof value === 'string') return value.trim();
@@ -427,9 +436,47 @@
     return location.pathname.endsWith('survey.html');
   }
 
+  function isSurveyHref(href){
+    if(!href) return false;
+    return href === 'survey.html' || href.endsWith('/survey.html');
+  }
+
   function isPublicHref(href){
     if(!href) return false;
-    return href === 'index.html' || href === './' || href === '/' || href.endsWith('/index.html') || href === 'survey.html' || href.endsWith('/survey.html') || href === 'accept-invite.html' || href.endsWith('/accept-invite.html');
+    return href === 'index.html' || href === './' || href === '/' || href.endsWith('/index.html') || href === 'accept-invite.html' || href.endsWith('/accept-invite.html');
+  }
+
+  function canAccessHref(href){
+    if(isPublicHref(href)) return true;
+    if(!hasActiveLogin()) return false;
+    if(isSurveyHref(href) && isViewerRole()) return false;
+    return true;
+  }
+
+  function getLinkAccessMessage(link){
+    var href = link && link.getAttribute ? link.getAttribute('href') : '';
+    if(isSurveyHref(href) && isViewerRole()){
+      return 'Your role does not allow starting a new survey.';
+    }
+
+    if(link && link.dataset && link.dataset.loginAlert){
+      return link.dataset.loginAlert;
+    }
+
+    return '';
+  }
+
+  function enforcePageAccess(){
+    if(!isSurveyPage()) return;
+    if(!hasActiveLogin()){
+      window.location.href = 'index.html';
+      return;
+    }
+
+    if(isViewerRole()){
+      window.alert('Your role does not allow starting a new survey.');
+      window.location.href = 'index.html';
+    }
   }
 
   function updateHeaderVisibility(){
@@ -450,9 +497,8 @@
     if(authButton) authButton.textContent = isLoggedIn ? 'Log Out' : 'Login';
 
     links.forEach(function(link){
-      // Public links stay available while dashboard-only links are gated until login.
-      var isPublicLink = isPublicHref(link.getAttribute('href'));
-      var isDisabled = !isLoggedIn && !isPublicLink;
+      var href = link.getAttribute('href');
+      var isDisabled = !canAccessHref(href);
       link.classList.toggle('is-disabled', isDisabled);
       link.setAttribute('aria-disabled', String(isDisabled));
       link.tabIndex = isDisabled ? -1 : 0;
@@ -482,14 +528,23 @@
   function setupNavigationGate(){
     document.addEventListener('click', function(ev){
       var link = ev.target.closest('a[href]');
-      if(!link || hasActiveLogin() || isPublicHref(link.getAttribute('href'))) return;
+      if(!link || canAccessHref(link.getAttribute('href'))) return;
 
       ev.preventDefault();
-      if(link.dataset.loginAlert){
-        // Some actions warn without opening the login dialog automatically.
-        window.alert(link.dataset.loginAlert);
+      var accessMessage = getLinkAccessMessage(link);
+      if(hasActiveLogin()){
+        if(accessMessage){
+          window.alert(accessMessage);
+        }
         return;
       }
+
+      if(accessMessage){
+        // Some actions warn without opening the login dialog automatically.
+        window.alert(accessMessage);
+        return;
+      }
+
       openLogin();
     });
   }
@@ -600,6 +655,7 @@
     setYear('year');
     setYear('year-2');
     setYear('year-3');
+    enforcePageAccess();
     renderBreadcrumbs();
     setupNavigationGate();
     setupLoginGate();
