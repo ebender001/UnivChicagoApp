@@ -19,6 +19,114 @@
     if(el) el.textContent = new Date().getFullYear();
   }
 
+  function getBreadcrumbItems(){
+    var path = location.pathname.split('/').pop() || 'index.html';
+    var params = new URLSearchParams(location.search);
+    var definitions = {
+      'index.html': [
+        { label: 'Dashboard' }
+      ],
+      'surveys.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Surveys' }
+      ],
+      'survey.html': params.get('enrolleeId')
+        ? [
+          { label: 'Dashboard', href: 'index.html' },
+          { label: 'Enrollees', href: 'enrollees.html' },
+          { label: 'Survey' }
+        ]
+        : [
+          { label: 'Dashboard', href: 'index.html' },
+          { label: 'Survey' }
+        ],
+      'enrollees.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Enrollees' }
+      ],
+      'enrollee-detail.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Enrollees', href: 'enrollees.html' },
+        { label: 'Enrollee Detail' }
+      ],
+      'enrollee-registration.html': params.get('surveyId')
+        ? [
+          { label: 'Dashboard', href: 'index.html' },
+          { label: 'Surveys', href: 'surveys.html' },
+          { label: 'Register Enrollee' }
+        ]
+        : params.get('enrolleeId')
+          ? [
+            { label: 'Dashboard', href: 'index.html' },
+            { label: 'Enrollees', href: 'enrollees.html' },
+            { label: 'Edit Enrollee' }
+          ]
+          : [
+            { label: 'Dashboard', href: 'index.html' },
+            { label: 'Enrollees', href: 'enrollees.html' },
+            { label: 'Register Enrollee' }
+          ],
+      'data-export.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Data Export' }
+      ],
+      'admin.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Admin' }
+      ],
+      'accept-invite.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Accept Invitation' }
+      ]
+    };
+
+    return definitions[path] || [{ label: 'Dashboard', href: 'index.html' }];
+  }
+
+  function renderBreadcrumbs(){
+    var main = document.getElementById('main-content');
+    if(!main) return;
+
+    var existing = document.getElementById('page-breadcrumbs');
+    if(existing) existing.remove();
+
+    var items = getBreadcrumbItems();
+    if(!items || !items.length) return;
+
+    var nav = document.createElement('nav');
+    nav.id = 'page-breadcrumbs';
+    nav.className = 'breadcrumbs';
+    nav.setAttribute('aria-label', 'Breadcrumb');
+
+    var list = document.createElement('ol');
+    list.className = 'breadcrumbs-list';
+
+    items.forEach(function(item, index){
+      var li = document.createElement('li');
+      li.className = 'breadcrumbs-item';
+      var isCurrent = index === items.length - 1;
+
+      if(item.href && !isCurrent){
+        var link = document.createElement('a');
+        link.href = item.href;
+        link.className = 'breadcrumbs-link';
+        link.textContent = item.label;
+        li.appendChild(link);
+      }else{
+        var span = document.createElement('span');
+        span.className = 'breadcrumbs-current';
+        span.textContent = item.label;
+        if(isCurrent) span.setAttribute('aria-current', 'page');
+        li.appendChild(span);
+      }
+
+      list.appendChild(li);
+    });
+
+    nav.appendChild(list);
+    main.insertBefore(nav, main.firstChild);
+  }
+
   function loadSiteHeader(){
     var target = document.querySelector('[data-site-header]');
     if(!target) return Promise.resolve();
@@ -492,6 +600,7 @@
     setYear('year');
     setYear('year-2');
     setYear('year-3');
+    renderBreadcrumbs();
     setupNavigationGate();
     setupLoginGate();
     setupInactivityLogout();
