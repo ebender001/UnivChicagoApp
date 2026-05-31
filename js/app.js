@@ -83,6 +83,16 @@
     stopInactivityTimer();
     closeSessionTimeoutOverlay();
     updateHeaderProfile(null);
+    dispatchAuthStateChange();
+  }
+
+  function dispatchAuthStateChange(){
+    document.dispatchEvent(new CustomEvent('befitme:authchange', {
+      detail: {
+        isLoggedIn: hasActiveLogin(),
+        user: getStoredCurrentUser()
+      }
+    }));
   }
 
   function applyLoginResult(result){
@@ -97,6 +107,7 @@
     updateHeaderProfile(result);
     updateAuthState();
     resetInactivityTimer();
+    dispatchAuthStateChange();
   }
 
   function hasActiveLogin(){
@@ -469,7 +480,9 @@
     applyLoginResult: applyLoginResult,
     updateHeaderProfile: updateHeaderProfile,
     clearLoginState: clearLoginState,
-    runCloudFunction: runCloudFunction
+    runCloudFunction: runCloudFunction,
+    hasActiveLogin: hasActiveLogin,
+    getStoredCurrentUser: getStoredCurrentUser
   };
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -487,6 +500,7 @@
       updateHeaderProfile(getStoredCurrentUser());
       updateHeaderVisibility();
       setupHeaderAuth();
+      dispatchAuthStateChange();
     });
 
     // Future shared behaviors:
