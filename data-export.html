@@ -33,15 +33,61 @@
           <button type="button" class="btn primary" id="show-activity-options">Activity Data</button>
         </div>
         <div id="activity-export-options" class="data-export-option-panel" hidden>
-          <button type="button" class="btn" data-activity-export="combined">One Activity File</button>
-          <button type="button" class="btn" data-activity-export="separate">HR, Pedometer, and Exercise ZIP</button>
-          <button type="button" class="btn" data-activity-export="heartRate">Heart Rate Only</button>
-          <button type="button" class="btn" data-activity-export="pedometer">Pedometer Only</button>
-          <button type="button" class="btn" data-activity-export="exercise">Exercise Only</button>
+          <div class="activity-export-menu">
+            <label for="activity-export-type">Activity Export Option</label>
+            <select id="activity-export-type" name="activityExportType">
+              <option value="combined">One Activity File</option>
+              <option value="separate">HR, Pedometer, and Exercise ZIP</option>
+              <option value="heartRate">Heart Rate Only</option>
+              <option value="pedometer">Pedometer Only</option>
+              <option value="exercise">Exercise Only</option>
+              <option value="byWatchNumber">Activity by Watch Number</option>
+              <option value="byDate">Activity by Date</option>
+            </select>
+          </div>
+          <div class="activity-export-menu-actions">
+            <button type="button" class="btn" id="run-activity-export">Continue</button>
+          </div>
         </div>
         <div id="data-export-status" role="status" aria-live="polite" hidden></div>
       </section>
     </main>
+
+    <div id="watch-number-export-overlay" class="pin-overlay" hidden>
+      <div class="pin-panel">
+        <h2>Select Watch Number</h2>
+        <p>Choose a watch number to download grouped exercise, heart rate, and pedometer files.</p>
+        <div class="form-row">
+          <label for="watch-number-export-select">Watch Number</label>
+          <select id="watch-number-export-select" name="watchNumberExport"></select>
+        </div>
+        <div class="form-actions pin-form-actions">
+          <button type="button" class="btn primary" id="confirm-watch-number-export">Download by Watch Number</button>
+          <button type="button" class="btn" id="cancel-watch-number-export">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="date-range-export-overlay" class="pin-overlay" hidden>
+      <div class="pin-panel">
+        <h2>Select Date Range</h2>
+        <p>Choose the date range to apply to the <code>endDate</code> field for exercise, heart rate, and pedometer exports.</p>
+        <div class="date-field-row">
+          <div class="form-row">
+            <label for="activity-end-date-from">Start Date</label>
+            <input type="date" id="activity-end-date-from" name="activityEndDateFrom" />
+          </div>
+          <div class="form-row">
+            <label for="activity-end-date-to">End Date</label>
+            <input type="date" id="activity-end-date-to" name="activityEndDateTo" />
+          </div>
+        </div>
+        <div class="form-actions pin-form-actions">
+          <button type="button" class="btn primary" id="confirm-date-range-export">Download by Date</button>
+          <button type="button" class="btn" id="cancel-date-range-export">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <footer class="site-footer">
       <div class="container">© <span id="year"></span> BeFitMe — All rights reserved.</div>

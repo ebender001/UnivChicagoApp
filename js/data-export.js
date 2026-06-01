@@ -1,6 +1,15 @@
 // Handles export downloads from the Data Export page.
 (function(){
   var crcTable = null;
+  var activityExportLabels = {
+    combined: 'One Activity File',
+    separate: 'HR, Pedometer, and Exercise ZIP',
+    heartRate: 'Heart Rate Only',
+    pedometer: 'Pedometer Only',
+    exercise: 'Exercise Only',
+    byWatchNumber: 'Activity by Watch Number',
+    byDate: 'Activity by Date'
+  };
 
   function showStatus(message, isError){
     var status = document.getElementById('data-export-status');
@@ -15,6 +24,11 @@
   function setButtonState(button, loading, label){
     button.disabled = loading;
     button.textContent = loading ? 'Preparing...' : label;
+  }
+
+  function setOverlayHidden(overlayId, hidden){
+    var overlay = document.getElementById(overlayId);
+    if(overlay) overlay.hidden = hidden;
   }
 
   function downloadBlob(filename, blob){
@@ -181,26 +195,154 @@
     if(panel) panel.hidden = true;
   }
 
+  function closeWatchNumberOverlay(){
+    setOverlayHidden('watch-number-export-overlay', true);
+  }
+
+  function closeDateRangeOverlay(){
+    setOverlayHidden('date-range-export-overlay', true);
+  }
+
+  function populateWatchNumberOptions(watchNumbers){
+    var select = document.getElementById('watch-number-export-select');
+    if(!select) return;
+
+    select.textContent = '';
+
+    (watchNumbers || []).forEach(function(watchNumber){
+      var option = document.createElement('option');
+      option.value = watchNumber;
+      option.textContent = '#' + watchNumber;
+      select.appendChild(option);
+    });
+  }
+
+  function loadWatchNumbers(){
+    if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
+      return Promise.reject(new Error('Login is not ready. Please refresh and try again.'));
+    }
+
+    return window.BeFitMeAuth.runCloudFunction('listActivityWatchNumbers').then(function(result){
+      var watchNumbers = result && Array.isArray(result.watchNumbers) ? result.watchNumbers : [];
+      populateWatchNumberOptions(watchNumbers);
+
+      if(!watchNumbers.length){
+        throw new Error('No watch numbers are available for export.');
+      }
+    });
+  }
+
+  function openWatchNumberOverlay(){
+    showStatus('Loading watch numbers...', false);
+    return loadWatchNumbers().then(function(){
+      setOverlayHidden('watch-number-export-overlay', false);
+      showStatus('', false);
+    }).catch(function(error){
+      console.log('Unable to load watch numbers:', error);
+      showStatus(error && error.message ? error.message : 'Unable to load watch numbers.', true);
+    });
+  }
+
+  function openDateRangeOverlay(){
+    setOverlayHidden('date-range-export-overlay', false);
+  }
+
+  function getSelectedActivityExportType(){
+    var select = document.getElementById('activity-export-type');
+    return select ? select.value : 'combined';
+  }
+
+  function runActivityExport(button, exportType, extraParams){
+    var label = activityExportLabels[exportType] || 'Activity Data';
+    var params = {
+      exportType: exportType,
+      format: getSelectedFormat()
+    };
+
+    Object.assign(params, extraParams || {});
+
+    runExport(button, 'downloadActivityData', label, params, 'Activity data exported.', 'activity-data.csv');
+  }
+
   function setupActivityOptions(){
     var toggle = document.getElementById('show-activity-options');
     var panel = document.getElementById('activity-export-options');
-    if(!toggle || !panel) return;
+    var runButton = document.getElementById('run-activity-export');
+    var watchConfirm = document.getElementById('confirm-watch-number-export');
+    var watchCancel = document.getElementById('cancel-watch-number-export');
+    var dateConfirm = document.getElementById('confirm-date-range-export');
+    var dateCancel = document.getElementById('cancel-date-range-export');
+    if(!toggle || !panel || !runButton) return;
 
     toggle.addEventListener('click', function(){
       panel.hidden = !panel.hidden;
     });
 
-    panel.querySelectorAll('[data-activity-export]').forEach(function(button){
-      var exportType = button.getAttribute('data-activity-export');
-      var label = button.textContent;
+    runButton.addEventListener('click', function(){
+      var exportType = getSelectedActivityExportType();
 
-      button.addEventListener('click', function(){
-        runExport(button, 'downloadActivityData', label, {
-          exportType: exportType,
-          format: getSelectedFormat()
-        }, 'Activity data exported.', 'activity-data.csv');
-      });
+      if(exportType === 'byWatchNumber'){
+        openWatchNumberOverlay();
+        return;
+      }
+
+      if(exportType === 'byDate'){
+        openDateRangeOverlay();
+        return;
+      }
+
+      runActivityExport(runButton, exportType);
     });
+
+    if(watchConfirm){
+      watchConfirm.addEventListener('click', function(){
+        var select = document.getElementById('watch-number-export-select');
+        var watchNumber = select ? select.value : '';
+
+        if(!watchNumber){
+          showStatus('Please select a watch number.', true);
+          return;
+        }
+
+        closeWatchNumberOverlay();
+        runActivityExport(watchConfirm, 'byWatchNumber', {
+          watchNumber: watchNumber
+        });
+      });
+    }
+
+    if(watchCancel){
+      watchCancel.addEventListener('click', closeWatchNumberOverlay);
+    }
+
+    if(dateConfirm){
+      dateConfirm.addEventListener('click', function(){
+        var startDate = document.getElementById('activity-end-date-from');
+        var endDate = document.getElementById('activity-end-date-to');
+        var endDateFrom = startDate ? startDate.value : '';
+        var endDateTo = endDate ? endDate.value : '';
+
+        if(!endDateFrom || !endDateTo){
+          showStatus('Please choose both dates for activity export by date.', true);
+          return;
+        }
+
+        if(endDateFrom > endDateTo){
+          showStatus('The start date must be on or before the end date.', true);
+          return;
+        }
+
+        closeDateRangeOverlay();
+        runActivityExport(dateConfirm, 'byDate', {
+          endDateFrom: endDateFrom,
+          endDateTo: endDateTo
+        });
+      });
+    }
+
+    if(dateCancel){
+      dateCancel.addEventListener('click', closeDateRangeOverlay);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function(){

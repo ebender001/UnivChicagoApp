@@ -230,9 +230,31 @@ input:focus-visible{
 .export-format-selector legend{ color:var(--accent); font-weight:800; }
 .data-export-actions{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0.75rem; margin-top:1rem; }
 .data-export-actions .btn{ width:100%; min-height:56px; }
-.data-export-option-panel{ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:0.75rem; margin-top:0.75rem; }
+.data-export-option-panel{ display:grid; gap:0.9rem; margin-top:0.75rem; padding:1rem; border:1px solid #dddddd; border-radius:var(--radius); background:#fafafa; }
 .data-export-option-panel[hidden]{ display:none; }
-.data-export-option-panel .btn{ width:100%; min-height:48px; }
+.activity-export-menu{
+  display:grid;
+  gap:0.45rem;
+}
+.activity-export-menu label{
+  color:var(--accent);
+  font-weight:800;
+}
+.activity-export-menu select{
+  width:100%;
+  min-height:52px;
+  padding:0.65rem 0.75rem;
+  border:2px solid var(--border);
+  border-radius:6px;
+  font-size:1rem;
+  background:#fff;
+  color:var(--text);
+}
+.activity-export-menu-actions{
+  display:flex;
+  justify-content:flex-start;
+}
+.activity-export-menu-actions .btn{ min-width:180px; }
 
 /* Admin */
 .admin-title-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
@@ -434,6 +456,7 @@ input:focus-visible{
   padding:1.25rem;
   background:rgba(11,11,11,0.42);
 }
+.pin-overlay[hidden]{ display:none; }
 .pin-panel{
   display:grid;
   gap:1rem;
