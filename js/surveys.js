@@ -28,6 +28,15 @@
     return cell;
   }
 
+  function getSurveyEnrolleeNumber(survey){
+    if(!survey || !survey.enrollee) return 'Not linked';
+
+    if(survey.enrollee.enrolleeNumber) return survey.enrollee.enrolleeNumber;
+    if(survey.enrollee.fields && survey.enrollee.fields.enrolleeNumber) return survey.enrollee.fields.enrolleeNumber;
+
+    return 'Not linked';
+  }
+
   function createActionCell(survey){
     var cell = document.createElement('td');
     var button = document.createElement('button');
@@ -72,7 +81,7 @@
       var row = document.createElement('tr');
       row.appendChild(createCell(formatDateTime(survey.createdAt)));
       row.appendChild(createCell(survey.objectId));
-      row.appendChild(createCell(survey.enrollee && survey.enrollee.objectId ? survey.enrollee.objectId : 'Not linked'));
+      row.appendChild(createCell(getSurveyEnrolleeNumber(survey)));
       body.appendChild(row);
     });
 
