@@ -46,6 +46,10 @@ body.login-required{ overflow:hidden; }
 .header-profile{ color:var(--muted); font-weight:700; line-height:1.25; }
 .header-profile-specialty{ font-size:0.95rem; color:var(--text); }
 .header-profile-institution{ font-size:0.85rem; }
+.header-status{ font-weight:800; }
+.header-status.status-online{ color:#12703d; }
+.header-status.status-poor{ color:#9a6700; }
+.header-status.status-offline{ color:#b42318; }
 .main-nav[hidden],
 .header-auth-button[hidden]{ display:none !important; }
 .main-nav{ display:flex; gap:0.75rem; }

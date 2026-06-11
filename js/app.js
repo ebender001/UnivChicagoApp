@@ -10,6 +10,15 @@
   var parseSdkPromise = null;
   var inactivityWarningDelayMs = 20 * 60 * 1000;
   var inactivityLogoutGraceMs = 60 * 1000;
+  var CONNECTIVITY_CHECK_INTERVAL_MS = 30000;
+  var CONNECTIVITY_CHECK_URL = '/partials/site-header.html';
+  var CONNECTIVITY_CHECK_TIMEOUT_MS = 5000;
+  var CONNECTIVITY_SLOW_THRESHOLD_MS = 2000;
+  var CONNECTIVITY_SLOW_CONFIRM_COUNT = 2;
+  var CONNECTIVITY_FAILURE_CONFIRM_COUNT = 2;
+  var connectivitySlowCount = 0;
+  var connectivityFailureCount = 0;
+  var connectivityRequestSequence = 0;
   var inactivityTimer = null;
   var inactivityLogoutTimer = null;
   var inactivityEvents = ['click', 'keydown', 'mousemove', 'touchstart', 'scroll'];
@@ -17,6 +26,113 @@
   function setYear(elementId){
     var el = document.getElementById(elementId);
     if(el) el.textContent = new Date().getFullYear();
+  }
+
+  function getConnectivityStatusElement(){
+    return document.getElementById('connectivity-status');
+  }
+
+  function setConnectivityStatus(text, state){
+    var status = getConnectivityStatusElement();
+    if(!status) return;
+
+    status.textContent = text;
+    status.classList.remove('status-online', 'status-offline', 'status-checking', 'status-poor');
+
+    if(state){
+      status.classList.add('status-' + state);
+    }
+  }
+
+  function markConnectivityOnline(){
+    connectivitySlowCount = 0;
+    connectivityFailureCount = 0;
+    setConnectivityStatus('Online', 'online');
+  }
+
+  function markConnectivityPoor(){
+    setConnectivityStatus('Poor connection', 'poor');
+  }
+
+  function markConnectivityOffline(){
+    setConnectivityStatus('Offline', 'offline');
+  }
+
+  function verifyConnectivity(){
+    var requestId = ++connectivityRequestSequence;
+    var startedAt = window.performance && typeof window.performance.now === 'function'
+      ? window.performance.now()
+      : Date.now();
+    var controller = typeof window.AbortController === 'function'
+      ? new AbortController()
+      : null;
+    var timeoutId = null;
+
+    setConnectivityStatus('Checking...', 'checking');
+
+    if(controller){
+      timeoutId = window.setTimeout(function(){
+        controller.abort();
+      }, CONNECTIVITY_CHECK_TIMEOUT_MS);
+    }
+
+    return fetch(CONNECTIVITY_CHECK_URL, {
+      cache: 'no-store',
+      method: 'HEAD',
+      signal: controller ? controller.signal : undefined
+    }).then(function(response){
+      var elapsedMs;
+      if(!response.ok) throw new Error('Connectivity check failed.');
+
+      elapsedMs = (window.performance && typeof window.performance.now === 'function'
+        ? window.performance.now()
+        : Date.now()) - startedAt;
+
+      if(requestId !== connectivityRequestSequence) return;
+
+      connectivityFailureCount = 0;
+      if(elapsedMs >= CONNECTIVITY_SLOW_THRESHOLD_MS){
+        connectivitySlowCount += 1;
+        if(connectivitySlowCount >= CONNECTIVITY_SLOW_CONFIRM_COUNT){
+          markConnectivityPoor();
+          return;
+        }
+      }else{
+        markConnectivityOnline();
+        return;
+      }
+
+      setConnectivityStatus('Online', 'online');
+    }).catch(function(){
+      if(requestId !== connectivityRequestSequence) return;
+
+      connectivitySlowCount = 0;
+      connectivityFailureCount += 1;
+
+      if(connectivityFailureCount >= CONNECTIVITY_FAILURE_CONFIRM_COUNT){
+        markConnectivityOffline();
+        return;
+      }
+
+      markConnectivityPoor();
+    }).finally(function(){
+      if(timeoutId){
+        window.clearTimeout(timeoutId);
+      }
+    });
+  }
+
+  function updateOfflineState(){
+    document.body.classList.toggle('offline', !navigator.onLine);
+
+    if(!navigator.onLine){
+      connectivitySlowCount = 0;
+      connectivityFailureCount = 0;
+      markConnectivityOffline();
+      return;
+    }
+
+    verifyConnectivity();
   }
 
   function getBreadcrumbItems(){
@@ -139,6 +255,7 @@
       })
       .then(function(html){
         target.innerHTML = html;
+        updateOfflineState();
       })
       .catch(function(error){
         console.error(error);
@@ -652,6 +769,7 @@
     window.localStorage.removeItem(loginStorageKey);
     window.localStorage.removeItem(currentUserStorageKey);
     window.localStorage.removeItem(legacyCurrentUserStorageKey);
+    updateOfflineState();
     setYear('year');
     setYear('year-2');
     setYear('year-3');
@@ -667,6 +785,12 @@
       setupHeaderAuth();
       dispatchAuthStateChange();
     });
+
+    window.addEventListener('online', updateOfflineState);
+    window.addEventListener('offline', updateOfflineState);
+    window.setInterval(function(){
+      if(navigator.onLine) verifyConnectivity();
+    }, CONNECTIVITY_CHECK_INTERVAL_MS);
 
     // Future shared behaviors:
     // - global fetch wrapper for authenticated requests
