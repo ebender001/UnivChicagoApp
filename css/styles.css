@@ -392,6 +392,9 @@ input:focus-visible{
 .timer-label{ color:var(--muted); font-weight:800; font-size:0.9rem; }
 .timer-display{ font-variant-numeric:tabular-nums; font-weight:800; font-size:1.35rem; }
 .gait-speed{ font-variant-numeric:tabular-nums; color:var(--text); font-weight:800; }
+.gait-entry-mode-group{ margin-top:0.25rem; }
+.gait-entry-section[hidden]{ display:none; }
+.gait-manual-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .registration-page .timer-button{ width:max-content; min-width:90px; }
 .registration-page .timer-button.timer-start{ border-color:#16803a; color:#16803a; background:#fff; }
 .registration-page .timer-button.timer-stop{ border-color:#b42318; color:#b42318; background:#fff; }
@@ -620,6 +623,7 @@ input:focus-visible{
   .data-export-option-panel{ grid-template-columns: 1fr; }
   .readonly-grid{ grid-template-columns: 1fr; }
   .timer-grid{ grid-template-columns: 1fr; }
+  .gait-manual-grid{ grid-template-columns: 1fr; }
   .three-field-row{ grid-template-columns: 1fr; }
   .dashboard-actions{ display:grid; grid-template-columns: 1fr; }
   .container{ padding:1rem; }

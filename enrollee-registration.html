@@ -132,21 +132,41 @@
                   <a href="https://www.youtube.com/watch?v=xLScK_NXUN0&list=PL51Avx1s9tVuTu0VIJXUM7HDN2ziqHGJb&index=13" target="_blank" rel="noreferrer">Gait test video</a>
                 </p>
               </div>
-              <div class="timer-grid">
-                <div class="timer-card">
-                  <h3>Trial 1</h3>
-                  <span class="timer-label">Elapsed time</span>
-                  <output id="gait-trial-1-display" class="timer-display">0.0 sec</output>
-                  <output id="gait-trial-1-speed" class="gait-speed" hidden></output>
-                  <button type="button" id="gait-trial-1-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-1">Start</button>
+              <fieldset class="form-row compact-choice-group gait-entry-mode-group">
+                <legend>How do you want to record gait speed?</legend>
+                <label class="choice" for="gait-entry-mode-timer">
+                  <input type="radio" id="gait-entry-mode-timer" name="gaitEntryMode" value="timer" checked />
+                  <span>Use timer here</span>
+                </label>
+                <label class="choice" for="gait-entry-mode-manual">
+                  <input type="radio" id="gait-entry-mode-manual" name="gaitEntryMode" value="manual" />
+                  <span>Enter recorded speeds</span>
+                </label>
+              </fieldset>
+              <div id="gait-timer-section" class="gait-entry-section">
+                <div class="timer-grid">
+                  <div class="timer-card">
+                    <h3>Trial 1</h3>
+                    <span class="timer-label">Elapsed time</span>
+                    <output id="gait-trial-1-display" class="timer-display">0.0 sec</output>
+                    <output id="gait-trial-1-speed" class="gait-speed" hidden></output>
+                    <button type="button" id="gait-trial-1-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-1">Start</button>
+                  </div>
+                  <div class="timer-card">
+                    <h3>Trial 2</h3>
+                    <span class="timer-label">Elapsed time</span>
+                    <output id="gait-trial-2-display" class="timer-display">0.0 sec</output>
+                    <output id="gait-trial-2-speed" class="gait-speed" hidden></output>
+                    <button type="button" id="gait-trial-2-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-2">Start</button>
+                  </div>
                 </div>
-                <div class="timer-card">
-                  <h3>Trial 2</h3>
-                  <span class="timer-label">Elapsed time</span>
-                  <output id="gait-trial-2-display" class="timer-display">0.0 sec</output>
-                  <output id="gait-trial-2-speed" class="gait-speed" hidden></output>
-                  <button type="button" id="gait-trial-2-button" class="btn timer-button" data-timer-button data-timer-id="gait-trial-2">Start</button>
+              </div>
+              <div id="gait-manual-section" class="gait-entry-section" hidden>
+                <div class="three-field-row gait-manual-grid">
+                  <input type="number" id="gait-speed-1" name="gaitSpeed1" placeholder="Trial 1 gait speed (m/sec)" min="0" step="0.01" inputmode="decimal" />
+                  <input type="number" id="gait-speed-2" name="gaitSpeed2" placeholder="Trial 2 gait speed (m/sec)" min="0" step="0.01" inputmode="decimal" />
                 </div>
+                <p class="field-note">Use this if the 4-meter walk was completed outside the app and you already have the gait speed values.</p>
               </div>
             </div>
           </div>

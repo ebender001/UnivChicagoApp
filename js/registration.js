@@ -86,6 +86,23 @@
     return Number((4 / seconds).toPrecision(2));
   }
 
+  function getSelectedGaitEntryMode(){
+    var selected = document.querySelector('input[name="gaitEntryMode"]:checked');
+    return selected ? selected.value : 'timer';
+  }
+
+  function getManualGaitValues(){
+    return ['gait-speed-1', 'gait-speed-2'].map(function(fieldId){
+      var field = document.getElementById(fieldId);
+      if(!field) return null;
+
+      var value = Number(field.value);
+      return Number.isFinite(value) && value > 0 ? Number(value.toFixed(2)) : null;
+    }).filter(function(value){
+      return value !== null;
+    });
+  }
+
   function updateGaitTimer(timerId){
     var timer = gaitTimers[timerId];
     if(!timer) return;
@@ -138,6 +155,10 @@
   }
 
   function getGaitValues(){
+    if(getSelectedGaitEntryMode() === 'manual'){
+      return getManualGaitValues();
+    }
+
     return ['gait-trial-1', 'gait-trial-2'].map(function(timerId){
       var timer = gaitTimers[timerId];
       if(!timer || getGaitElapsedMs(timer) <= 0) return null;
@@ -145,6 +166,30 @@
     }).filter(function(value){
       return value !== null;
     });
+  }
+
+  function syncGaitEntryMode(){
+    var timerSection = document.getElementById('gait-timer-section');
+    var manualSection = document.getElementById('gait-manual-section');
+    var manualFields = ['gait-speed-1', 'gait-speed-2'].map(function(fieldId){
+      return document.getElementById(fieldId);
+    }).filter(Boolean);
+    var isManual = getSelectedGaitEntryMode() === 'manual';
+
+    if(timerSection) timerSection.hidden = isManual;
+    if(manualSection) manualSection.hidden = !isManual;
+
+    manualFields.forEach(function(field){
+      field.disabled = !isManual;
+
+      if(!isManual){
+        field.value = '';
+      }
+    });
+
+    if(isManual){
+      resetGaitTimers();
+    }
   }
 
   function toggleGaitTimer(timerId){
@@ -240,7 +285,26 @@
 
     if(!showFollowUp){
       resetGaitTimers();
+      ['gait-speed-1', 'gait-speed-2'].forEach(function(fieldId){
+        var field = document.getElementById(fieldId);
+        if(field){
+          field.value = '';
+          field.disabled = true;
+        }
+      });
+      var timerOption = document.querySelector('input[name="gaitEntryMode"][value="timer"]');
+      if(timerOption) timerOption.checked = true;
+      document.querySelectorAll('input[name="gaitEntryMode"]').forEach(function(field){
+        field.disabled = true;
+      });
+      syncGaitEntryMode();
+      return;
     }
+
+    document.querySelectorAll('input[name="gaitEntryMode"]').forEach(function(field){
+      field.disabled = false;
+    });
+    syncGaitEntryMode();
   }
 
   function setupHelpPopover(helpButtonId, closeButtonId, popoverId){
@@ -380,6 +444,11 @@
   }
 
   function setGaitControlsReadonly(){
+    document.querySelectorAll('input[name="gaitEntryMode"]').forEach(function(field){
+      field.disabled = true;
+    });
+    setFieldsDisabled(['gait-speed-1', 'gait-speed-2'], true);
+
     Object.keys(gaitTimers).forEach(function(timerId, index){
       var timer = gaitTimers[timerId];
       var speed = existingGaitValues[index];
@@ -490,6 +559,9 @@
     setupHelpPopover('grip-test-help', 'close-grip-test-help', 'grip-test-help-popover');
     setupHelpPopover('gait-test-help', 'close-gait-test-help', 'gait-test-help-popover');
     setupGaitTimers();
+    document.querySelectorAll('input[name="gaitEntryMode"]').forEach(function(choice){
+      choice.addEventListener('change', syncGaitEntryMode);
+    });
     syncGripTestFollowUp();
     syncGaitTestFollowUp();
 
