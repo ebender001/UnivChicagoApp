@@ -50,6 +50,13 @@ body.login-required{ overflow:hidden; }
 .header-status.status-online{ color:#12703d; }
 .header-status.status-poor{ color:#9a6700; }
 .header-status.status-offline{ color:#b42318; }
+.auth-status-notice{
+  position:sticky;
+  top:0;
+  z-index:30;
+  max-width:1100px;
+  margin:1rem auto 0;
+}
 .main-nav[hidden],
 .header-auth-button[hidden]{ display:none !important; }
 .main-nav{ display:flex; gap:0.75rem; }

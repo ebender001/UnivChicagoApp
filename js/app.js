@@ -8,6 +8,7 @@
   var parseServerURL = 'https://parseapi.back4app.com/';
   var parseSdkURL = 'https://npmcdn.com/parse/dist/parse.min.js';
   var parseSdkPromise = null;
+  var sessionExpiredMessage = 'Your session has expired. Please log in again.';
   var inactivityWarningDelayMs = 20 * 60 * 1000;
   var inactivityLogoutGraceMs = 60 * 1000;
   var CONNECTIVITY_CHECK_INTERVAL_MS = 30000;
@@ -278,6 +279,40 @@
     return user && typeof user.role === 'string' ? user.role.trim().toLowerCase() : '';
   }
 
+  function createAuthNotice(){
+    var notice = document.createElement('div');
+    notice.id = 'auth-status-notice';
+    notice.className = 'auth-status-notice form-error';
+    notice.setAttribute('role', 'alert');
+    notice.setAttribute('aria-live', 'assertive');
+    notice.hidden = true;
+    document.body.appendChild(notice);
+  }
+
+  function ensureAuthNotice(){
+    if(!document.getElementById('auth-status-notice')) createAuthNotice();
+  }
+
+  function hideAuthNotice(){
+    var notice = document.getElementById('auth-status-notice');
+    if(!notice) return;
+
+    notice.textContent = '';
+    notice.hidden = true;
+  }
+
+  function showAuthNotice(message){
+    if(!message) return;
+
+    ensureAuthNotice();
+
+    var notice = document.getElementById('auth-status-notice');
+    if(!notice) return;
+
+    notice.textContent = message;
+    notice.hidden = false;
+  }
+
   function isViewerRole(){
     return getStoredUserRole() === 'viewer';
   }
@@ -341,6 +376,7 @@
     updateHeaderProfile(result);
     updateAuthState();
     resetInactivityTimer();
+    hideAuthNotice();
     dispatchAuthStateChange();
   }
 
@@ -380,6 +416,56 @@
     return 'Unable to log in. Please check your username and password.';
   }
 
+  function getParseErrorCode(errorName, fallback){
+    if(window.Parse && window.Parse.Error && typeof window.Parse.Error[errorName] === 'number'){
+      return window.Parse.Error[errorName];
+    }
+
+    return fallback;
+  }
+
+  function isSessionInvalidError(error){
+    var code = error && typeof error.code === 'number' ? error.code : null;
+    var message = error && typeof error.message === 'string' ? error.message.toLowerCase() : '';
+
+    return code === getParseErrorCode('INVALID_SESSION_TOKEN', 209)
+      || code === getParseErrorCode('SESSION_MISSING', 206)
+      || message.indexOf('invalid session token') !== -1
+      || message.indexOf('session missing') !== -1
+      || message.indexOf('session token is invalid') !== -1;
+  }
+
+  function createSessionExpiredError(error){
+    var authError = new Error(sessionExpiredMessage);
+    authError.name = 'SessionExpiredError';
+    authError.code = error && error.code;
+    authError.isSessionExpired = true;
+    authError.originalError = error || null;
+    return authError;
+  }
+
+  function handleAuthenticatedRequestError(error){
+    var authError;
+    if(!isSessionInvalidError(error)) return Promise.reject(error);
+
+    authError = createSessionExpiredError(error);
+
+    clearLoginState();
+    stopInactivityTimer();
+    closeSessionTimeoutOverlay();
+    closeLogin();
+    showAuthNotice(authError.message);
+
+    document.dispatchEvent(new CustomEvent('befitme:sessionexpired', {
+      detail: {
+        message: authError.message,
+        error: authError
+      }
+    }));
+
+    return Promise.reject(authError);
+  }
+
   function runCloudFunction(functionName, params){
     var user = getStoredCurrentUser();
     if(!user || !user.sessionToken){
@@ -393,7 +479,7 @@
       return window.Parse.Cloud.run(functionName, params || {}, {
         sessionToken: user.sessionToken
       });
-    });
+    }).catch(handleAuthenticatedRequestError);
   }
 
   function runPublicCloudFunction(functionName, params){
@@ -502,6 +588,7 @@
   function logoutUser(options){
     clearLoginState();
     closeLogin();
+    hideAuthNotice();
     updateAuthState();
     console.log('Logout successful');
     if(options && options.redirect) redirectAfterLogout();
