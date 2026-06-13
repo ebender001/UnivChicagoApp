@@ -396,6 +396,47 @@
     });
   }
 
+  function runPublicCloudFunction(functionName, params){
+    return loadParseSdk().then(function(){
+      if(!initializeParse()) throw new Error('Parse could not be loaded.');
+      return window.Parse.Cloud.run(functionName, params || {});
+    });
+  }
+
+  function setLoginFieldError(input, hasError){
+    if(!input) return;
+    input.classList.toggle('input-error', Boolean(hasError));
+    input.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+  }
+
+  function hideLoginMessage(message){
+    if(!message) return;
+    message.textContent = '';
+    message.hidden = true;
+    message.classList.remove('success');
+    message.classList.add('form-error');
+  }
+
+  function showLoginError(message){
+    var error = document.getElementById('login-error');
+    if(!error) return;
+
+    error.textContent = message;
+    error.hidden = false;
+    error.classList.remove('success');
+    error.classList.add('form-error');
+  }
+
+  function showLoginSuccess(message){
+    var error = document.getElementById('login-error');
+    if(!error) return;
+
+    error.textContent = message;
+    error.hidden = false;
+    error.classList.remove('form-error');
+    error.classList.add('success');
+  }
+
   function createLoginOverlay(){
     var wrapper = document.createElement('div');
     wrapper.id = 'login-overlay';
@@ -408,13 +449,14 @@
       '<form id="login-form" class="login-panel">',
       '<h2 id="login-title">Log in to BeFitMe</h2>',
       '<div class="form-row">',
-      '<label for="login-username">Username</label>',
+      '<label for="login-username">Username or Email</label>',
       '<input type="text" id="login-username" name="username" autocomplete="username" required />',
       '</div>',
       '<div class="form-row">',
       '<label for="login-password">Password</label>',
       '<input type="password" id="login-password" name="password" autocomplete="current-password" required />',
       '</div>',
+      '<button type="button" class="login-link-button" id="forgot-password-link">Forgot password?</button>',
       '<div id="login-error" class="form-error" role="alert" hidden></div>',
       '<div class="login-actions">',
       '<button type="submit" class="btn primary">Log in</button>',
@@ -437,10 +479,8 @@
     var error = document.getElementById('login-error');
     if(!overlay) return;
 
-    if(error){
-      error.textContent = '';
-      error.hidden = true;
-    }
+    hideLoginMessage(error);
+    setLoginFieldError(username, false);
 
     overlay.hidden = false;
     document.body.classList.add('login-required');
@@ -676,11 +716,49 @@
     var error = document.getElementById('login-error');
     var cancel = form ? form.querySelector('[data-login-cancel]') : null;
     var submit = form ? form.querySelector('[type="submit"]') : null;
+    var forgotPassword = document.getElementById('forgot-password-link');
     if(!overlay || !form) return;
 
     if(cancel){
       cancel.addEventListener('click', function(){
         closeLogin();
+      });
+    }
+
+    if(username){
+      username.addEventListener('input', function(){
+        if(username.value.trim()){
+          setLoginFieldError(username, false);
+          hideLoginMessage(error);
+        }
+      });
+    }
+
+    if(forgotPassword){
+      forgotPassword.addEventListener('click', function(){
+        var loginName = username ? username.value.trim() : '';
+
+        if(!loginName){
+          setLoginFieldError(username, true);
+          showLoginError('Enter your username or email to reset your password.');
+          if(username) username.focus();
+          return;
+        }
+
+        forgotPassword.disabled = true;
+        setLoginFieldError(username, false);
+        hideLoginMessage(error);
+
+        runPublicCloudFunction('requestDashboardPasswordReset', {
+          username: loginName
+        }).then(function(){
+          showLoginSuccess('If that account exists, a password reset email has been sent.');
+        }).catch(function(resetError){
+          console.log('Password reset request failed:', resetError);
+          showLoginError(resetError && resetError.message ? resetError.message : 'Unable to request a password reset right now.');
+        }).finally(function(){
+          forgotPassword.disabled = false;
+        });
       });
     }
 
@@ -691,10 +769,8 @@
         return;
       }
 
-      if(error){
-        error.textContent = '';
-        error.hidden = true;
-      }
+      hideLoginMessage(error);
+      setLoginFieldError(username, false);
 
       if(submit){
         submit.disabled = true;
@@ -715,10 +791,7 @@
         form.reset();
       }).catch(function(loginError){
         console.log('Login failed', loginError);
-        if(error){
-          error.textContent = getErrorMessage(loginError);
-          error.hidden = false;
-        }
+        showLoginError(getErrorMessage(loginError));
       }).finally(function(){
         if(submit){
           submit.disabled = false;
@@ -761,6 +834,7 @@
     updateHeaderProfile: updateHeaderProfile,
     clearLoginState: clearLoginState,
     runCloudFunction: runCloudFunction,
+    runPublicCloudFunction: runPublicCloudFunction,
     hasActiveLogin: hasActiveLogin,
     getStoredCurrentUser: getStoredCurrentUser
   };

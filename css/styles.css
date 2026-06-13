@@ -136,6 +136,8 @@ input:focus-visible{
 .form-row label{ font-weight:700; margin-bottom:0.25rem; }
 .form-row input,
 .form-row select{ width:100%; min-height:52px; padding:0.65rem 0.75rem; border:2px solid var(--border); border-radius:6px; font-size:1.05rem; background:#fff; color:var(--text); }
+.form-row input.input-error,
+.form-row select.input-error{ border-color:#b42318; background:#fff7f6; }
 .form-error{ padding:0.75rem; border:2px solid #b42318; border-radius:6px; background:#fff2f0; color:#8a160f; font-weight:800; }
 .choice{
   display:flex;
@@ -424,6 +426,25 @@ input:focus-visible{
   box-shadow:0 14px 34px rgba(0,0,0,0.22);
 }
 .login-panel h2{ margin:0; color:var(--accent); font-size:1.35rem; }
+.login-link-button{
+  justify-self:start;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--accent);
+  font:inherit;
+  font-weight:700;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.login-link-button:hover,
+.login-link-button:focus-visible{
+  color:var(--accent-dark);
+}
+.login-link-button:disabled{
+  color:var(--muted);
+  cursor:wait;
+}
 .session-timeout-panel p{ margin:0; color:var(--text); font-weight:700; }
 .login-panel .btn{ width:100%; }
 .login-actions{ display:grid; gap:0.75rem; }
