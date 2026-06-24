@@ -774,6 +774,7 @@
   function setupNavigationGate(){
     document.addEventListener('click', function(ev){
       var link = ev.target.closest('a[href]');
+      if(link && link.hasAttribute('download')) return;
       if(!link || canAccessHref(link.getAttribute('href'))) return;
 
       ev.preventDefault();
