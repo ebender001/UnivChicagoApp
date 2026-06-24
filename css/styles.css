@@ -717,58 +717,60 @@ input:focus-visible{
 .site-footer{ margin-top:2rem; padding:1rem 0; color:var(--muted); font-size:1rem; }
 
 @media print{
-  body *{
-    visibility:hidden !important;
+  @page{
+    margin:0;
   }
-  body.printing-survey-qr #survey-qr-overlay,
-  body.printing-survey-qr #survey-qr-overlay .qr-code-frame,
-  body.printing-survey-qr #survey-qr-overlay .qr-code-image{
-    visibility:visible !important;
+  html,
+  body{
+    margin:0 !important;
+    padding:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+    background:#fff !important;
+  }
+  body.printing-survey-qr > *:not(#survey-qr-overlay){
+    display:none !important;
   }
   body.printing-survey-qr #survey-qr-overlay{
-    position:static;
-    inset:auto;
-    display:block;
-    padding:0;
-    background:transparent;
+    position:fixed !important;
+    inset:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    padding:0 !important;
+    margin:0 !important;
+    background:#fff !important;
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
   }
   body.printing-survey-qr .qr-panel{
-    display:block;
-    width:100%;
-    max-width:none;
-    max-height:none;
-    margin:0;
-    padding:0;
-    border:0;
-    box-shadow:none;
-    text-align:center;
-    break-inside:avoid;
-    page-break-inside:avoid;
+    display:block !important;
+    width:auto !important;
+    max-width:none !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
   }
   body.printing-survey-qr .qr-code-frame{
-    display:block;
-    gap:1rem;
-    padding:0;
-    border:0;
-    background:transparent;
-    text-align:center;
-    break-inside:avoid;
-    page-break-inside:avoid;
-    break-before:avoid;
-    page-break-before:avoid;
-    break-after:avoid;
-    page-break-after:avoid;
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
   }
   body.printing-survey-qr .qr-code-image{
-    width:4.75in;
-    max-width:100%;
-    margin:0 auto;
-    break-inside:avoid;
-    page-break-inside:avoid;
-    break-before:avoid;
-    page-break-before:avoid;
-    break-after:avoid;
-    page-break-after:avoid;
+    display:block !important;
+    width:4.75in !important;
+    max-width:4.75in !important;
+    margin:0 auto !important;
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
   }
   body.printing-survey-qr .qr-panel h2,
   body.printing-survey-qr .qr-panel-instructions,
