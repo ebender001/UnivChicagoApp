@@ -281,13 +281,17 @@
       console.log('Survey payload:', payload);
       setSubmitState(form, true);
 
-      if(!window.BeFitMeAuth || !window.BeFitMeAuth.runCloudFunction){
-        showError('Login is not ready. Please refresh and try again.');
+      if(!window.BeFitMeAuth || !window.BeFitMeAuth.runPublicCloudFunction){
+        showError('Survey saving is not ready. Please refresh and try again.');
         setSubmitState(form, false);
         return;
       }
 
-      window.BeFitMeAuth.runCloudFunction('saveSurveyResults', {
+      var saveSurvey = window.BeFitMeAuth.hasActiveLogin && window.BeFitMeAuth.hasActiveLogin()
+        ? window.BeFitMeAuth.runCloudFunction
+        : window.BeFitMeAuth.runPublicCloudFunction;
+
+      saveSurvey('saveSurveyResults', {
         survey: payload
       }).then(function(result){
         console.log('Survey saved:', result);

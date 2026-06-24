@@ -687,7 +687,14 @@
 
   function isPublicHref(href){
     if(!href) return false;
-    return href === 'index.html' || href === './' || href === '/' || href.endsWith('/index.html') || href === 'accept-invite.html' || href.endsWith('/accept-invite.html');
+    return href === 'index.html'
+      || href === './'
+      || href === '/'
+      || href.endsWith('/index.html')
+      || href === 'survey.html'
+      || href.endsWith('/survey.html')
+      || href === 'accept-invite.html'
+      || href.endsWith('/accept-invite.html');
   }
 
   function canAccessHref(href){
@@ -712,12 +719,7 @@
 
   function enforcePageAccess(){
     if(!isSurveyPage()) return;
-    if(!hasActiveLogin()){
-      window.location.href = 'index.html';
-      return;
-    }
-
-    if(isViewerRole()){
+    if(hasActiveLogin() && isViewerRole()){
       window.alert('Your role does not allow starting a new survey.');
       window.location.href = 'index.html';
     }
