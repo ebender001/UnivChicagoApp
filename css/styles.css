@@ -530,21 +530,45 @@ input:focus-visible{
 }
 .qr-panel h2{ margin:0; color:var(--accent); font-size:1.45rem; line-height:1.25; }
 .qr-panel p{ margin:0; }
+.qr-panel-instructions{
+  color:var(--text);
+  font-size:1.05rem;
+  font-weight:700;
+  line-height:1.45;
+}
 .qr-code-frame{
   display:grid;
   place-items:center;
   gap:0.75rem;
-  padding:1rem;
+  padding:1.25rem;
   border:2px solid #dddddd;
   border-radius:var(--radius);
   background:#fafafa;
 }
 .qr-code-image{
   display:block;
-  width:min(320px, 100%);
+  width:min(360px, 100%);
   aspect-ratio:1 / 1;
   object-fit:contain;
   background:#fff;
+}
+.qr-status{
+  width:100%;
+  padding:0.85rem 1rem;
+  border-radius:6px;
+  font-size:0.98rem;
+  font-weight:800;
+  text-align:center;
+}
+.qr-status.is-error{
+  border:2px solid #b42318;
+  background:#fff2f0;
+  color:#8a160f;
+}
+.qr-status.is-success{
+  border:2px solid #8cc59d;
+  background:#e8f5ed;
+  color:#074f22;
 }
 .qr-code-url{
   width:100%;
@@ -563,7 +587,10 @@ input:focus-visible{
   grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:0.75rem;
 }
-.qr-panel-actions .btn{ width:100%; }
+.qr-panel-actions .btn{
+  width:100%;
+  min-height:56px;
+}
 .pin-display{
   padding:0.7rem 1rem;
   border:2px solid var(--accent);
@@ -688,6 +715,53 @@ input:focus-visible{
 
 /* Footer */
 .site-footer{ margin-top:2rem; padding:1rem 0; color:var(--muted); font-size:1rem; }
+
+@media print{
+  body *{
+    visibility:hidden !important;
+  }
+  body.printing-survey-qr #survey-qr-overlay,
+  body.printing-survey-qr #survey-qr-overlay *{
+    visibility:visible !important;
+  }
+  body.printing-survey-qr #survey-qr-overlay{
+    position:static;
+    inset:auto;
+    display:block;
+    padding:0;
+    background:transparent;
+  }
+  body.printing-survey-qr .qr-panel{
+    width:100%;
+    max-width:none;
+    max-height:none;
+    margin:0;
+    padding:0;
+    border:0;
+    box-shadow:none;
+    text-align:center;
+  }
+  body.printing-survey-qr .qr-code-frame{
+    gap:1rem;
+    padding:0;
+    border:0;
+    background:transparent;
+  }
+  body.printing-survey-qr .qr-code-image{
+    width:4.75in;
+    max-width:100%;
+    margin:0 auto;
+  }
+  body.printing-survey-qr .qr-panel-actions,
+  body.printing-survey-qr .header-status,
+  body.printing-survey-qr .auth-status-notice,
+  body.printing-survey-qr .site-header,
+  body.printing-survey-qr .site-footer,
+  body.printing-survey-qr .skip-link,
+  body.printing-survey-qr #page-breadcrumbs{
+    display:none !important;
+  }
+}
 
 /* Responsive */
 @media (max-width: 900px){
