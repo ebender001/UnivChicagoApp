@@ -740,17 +740,40 @@ input:focus-visible{
     border:0;
     box-shadow:none;
     text-align:center;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  body.printing-survey-qr .qr-panel h2,
+  body.printing-survey-qr .qr-panel-instructions,
+  body.printing-survey-qr .qr-code-url,
+  body.printing-survey-qr .qr-status{
+    break-inside:avoid;
+    page-break-inside:avoid;
+    break-after:avoid;
+    page-break-after:avoid;
   }
   body.printing-survey-qr .qr-code-frame{
     gap:1rem;
     padding:0;
     border:0;
     background:transparent;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    break-before:avoid;
+    page-break-before:avoid;
+    break-after:avoid;
+    page-break-after:avoid;
   }
   body.printing-survey-qr .qr-code-image{
     width:4.75in;
     max-width:100%;
     margin:0 auto;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    break-before:avoid;
+    page-break-before:avoid;
+    break-after:avoid;
+    page-break-after:avoid;
   }
   body.printing-survey-qr .qr-panel-actions,
   body.printing-survey-qr .header-status,
