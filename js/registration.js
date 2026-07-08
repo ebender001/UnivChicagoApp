@@ -416,6 +416,14 @@
     field.value = value === null || value === undefined ? '' : String(value);
   }
 
+  function datesAreComplete(){
+    var startDate = document.getElementById('start-date');
+    var stopDate = document.getElementById('stop-date');
+
+    if(!startDate || !stopDate) return true;
+    return Boolean(startDate.value && stopDate.value);
+  }
+
   function formatDateInput(value){
     if(!value) return '';
 
@@ -579,6 +587,12 @@
 
       form.addEventListener('submit', function(ev){
         ev.preventDefault();
+
+        if(!datesAreComplete()){
+          showRegistrationStatus('Start date and stop date are required before submitting.', true);
+          form.reportValidity();
+          return;
+        }
 
         if(!form.checkValidity()){
           form.reportValidity();
