@@ -194,6 +194,14 @@
       'accept-invite.html': [
         { label: 'Dashboard', href: 'index.html' },
         { label: 'Accept Invitation' }
+      ],
+      'user-guide.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'User Guide' }
+      ],
+      'accept-invite.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Accept Invitation' }
       ]
     };
 
