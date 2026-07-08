@@ -591,6 +591,33 @@ input:focus-visible{
   width:100%;
   min-height:56px;
 }
+.user-guide-overlay{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  display:grid;
+  place-items:center;
+  padding:1.25rem;
+  background:rgba(11,11,11,0.42);
+}
+.user-guide-overlay[hidden]{ display:none; }
+.user-guide-panel{
+  display:grid;
+  gap:1rem;
+  width:min(480px, 100%);
+  padding:1.5rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:#fff;
+  box-shadow:0 14px 34px rgba(0,0,0,0.22);
+}
+.user-guide-panel h2{ margin:0; color:var(--accent); font-size:1.45rem; line-height:1.25; }
+.user-guide-panel p{ margin:0; color:var(--text); }
+.user-guide-actions{
+  display:grid;
+  gap:0.75rem;
+}
+.user-guide-actions .btn{ width:100%; }
 .pin-display{
   padding:0.7rem 1rem;
   border:2px solid var(--accent);

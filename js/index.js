@@ -1,6 +1,8 @@
 (function(){
   var overlayId = 'survey-qr-overlay';
   var triggerId = 'show-survey-qr-code';
+  var userGuideOverlayId = 'user-guide-overlay';
+  var userGuideTriggerId = 'show-user-guide';
   var printClassName = 'printing-survey-qr';
   var copyResetTimer = null;
 
@@ -259,12 +261,104 @@
     elements.overlay.dataset.bound = 'true';
   }
 
+  function createUserGuideOverlay(){
+    var overlay = document.createElement('div');
+    overlay.id = userGuideOverlayId;
+    overlay.className = 'user-guide-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'user-guide-title');
+    overlay.hidden = true;
+    overlay.innerHTML = [
+      '<div class="user-guide-panel">',
+      '<h2 id="user-guide-title">User Guide Options</h2>',
+      '<p>Choose how you would like to access the BeFitMe User Guide.</p>',
+      '<div class="user-guide-actions">',
+      '<button type="button" class="btn primary" id="view-user-guide">View in Browser</button>',
+      '<button type="button" class="btn" id="download-user-guide">Download Word Document</button>',
+      '<button type="button" class="btn" id="close-user-guide">Close</button>',
+      '</div>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function ensureUserGuideOverlay(){
+    return document.getElementById(userGuideOverlayId) || createUserGuideOverlay();
+  }
+
+  function openUserGuideOverlay(){
+    ensureUserGuideOverlay();
+    var overlay = document.getElementById(userGuideOverlayId);
+    if(overlay) overlay.hidden = false;
+
+    var viewButton = document.getElementById('view-user-guide');
+    if(viewButton) viewButton.focus();
+  }
+
+  function closeUserGuideOverlay(){
+    var overlay = document.getElementById(userGuideOverlayId);
+    if(overlay) overlay.hidden = true;
+
+    var trigger = document.getElementById(userGuideTriggerId);
+    if(trigger) trigger.focus();
+  }
+
+  function openUserGuideInTab(){
+    window.open('user-guide.html', '_blank', 'noopener,noreferrer');
+    closeUserGuideOverlay();
+  }
+
+  function downloadUserGuideDocument(){
+    var link = document.createElement('a');
+    link.href = 'END_USER_GUIDE.docx';
+    link.download = 'END_USER_GUIDE.docx';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    closeUserGuideOverlay();
+  }
+
+  function bindUserGuideEvents(){
+    var overlay = document.getElementById(userGuideOverlayId);
+    if(!overlay || overlay.dataset.bound === 'true') return;
+
+    var viewButton = document.getElementById('view-user-guide');
+    var downloadButton = document.getElementById('download-user-guide');
+    var closeButton = document.getElementById('close-user-guide');
+
+    if(viewButton) viewButton.addEventListener('click', openUserGuideInTab);
+    if(downloadButton) downloadButton.addEventListener('click', downloadUserGuideDocument);
+    if(closeButton) closeButton.addEventListener('click', closeUserGuideOverlay);
+
+    overlay.addEventListener('click', function(ev){
+      if(ev.target === overlay) closeUserGuideOverlay();
+    });
+
+    document.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape' && overlay && !overlay.hidden){
+        closeUserGuideOverlay();
+      }
+    });
+
+    overlay.dataset.bound = 'true';
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
     var trigger = document.getElementById(triggerId);
-    if(!trigger) return;
+    if(trigger){
+      ensureOverlay();
+      bindEvents();
+      trigger.addEventListener('click', openOverlay);
+    }
 
-    ensureOverlay();
-    bindEvents();
-    trigger.addEventListener('click', openOverlay);
+    var userGuideTrigger = document.getElementById(userGuideTriggerId);
+    if(userGuideTrigger){
+      ensureUserGuideOverlay();
+      bindUserGuideEvents();
+      userGuideTrigger.addEventListener('click', openUserGuideOverlay);
+    }
   });
 })();
