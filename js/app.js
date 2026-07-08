@@ -702,7 +702,9 @@
       || href === 'survey.html'
       || href.endsWith('/survey.html')
       || href === 'accept-invite.html'
-      || href.endsWith('/accept-invite.html');
+      || href.endsWith('/accept-invite.html')
+      || href === 'privacy.html'
+      || href.endsWith('/privacy.html');
   }
 
   function canAccessHref(href){
