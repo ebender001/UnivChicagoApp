@@ -325,15 +325,18 @@
     users.forEach(function(user){
       var row = document.createElement('tr');
       var nameCell = document.createElement('td');
+      var roleCell = document.createElement('td');
       var institutionCell = document.createElement('td');
       var specialtyCell = document.createElement('td');
       var actionCell = document.createElement('td');
 
       nameCell.textContent = user.name;
+      roleCell.textContent = user.roleDisplayName || user.role || '';
       institutionCell.textContent = user.institutionName || '';
       specialtyCell.textContent = user.specialtyName || '';
 
       row.appendChild(nameCell);
+      if(options.showRole) row.appendChild(roleCell);
       row.appendChild(institutionCell);
       row.appendChild(specialtyCell);
       if(options.showDelete){
@@ -411,12 +414,14 @@
       renderUsers(activeUsers, {
         bodyId: 'active-users-list-body',
         wrapId: 'active-users-list-wrap',
-        showDelete: true
+        showDelete: true,
+        showRole: true
       });
       renderUsers(inactiveUsers, {
         bodyId: 'inactive-users-list-body',
         wrapId: 'inactive-users-list-wrap',
-        showDelete: false
+        showDelete: false,
+        showRole: false
       });
 
       setUserListStatus(users.length ? '' : 'No users found.');
