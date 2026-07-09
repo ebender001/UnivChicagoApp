@@ -46,7 +46,7 @@
     if(okButton){
       okButton.focus();
       okButton.addEventListener('click', function(){
-        window.location.href = 'enrollee-registration.html';
+        window.location.href = 'surveys.html?expandUnenrolled=1';
       });
     }
   }

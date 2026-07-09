@@ -141,8 +141,7 @@
       var panel = document.getElementById(button.getAttribute('aria-controls'));
       if(!panel) return;
 
-      button.addEventListener('click', function(){
-        var expanded = button.getAttribute('aria-expanded') === 'true';
+      function setExpanded(expanded){
         window.clearTimeout(panel.hideTimer);
         window.clearTimeout(panel.heightTimer);
 
@@ -179,12 +178,29 @@
             }
           }, 300);
         });
+      }
+
+      button.addEventListener('click', function(){
+        setExpanded(button.getAttribute('aria-expanded') === 'true');
       });
+
+      button._setExpandedState = setExpanded;
     });
+  }
+
+  function expandRequestedSections(){
+    var params = new URLSearchParams(window.location.search);
+    if(params.get('expandUnenrolled') !== '1') return;
+
+    var button = document.querySelector('[aria-controls="unenrolled-surveys-panel"][data-collapse-toggle]');
+    if(button && typeof button._setExpandedState === 'function' && button.getAttribute('aria-expanded') !== 'true'){
+      button._setExpandedState(false);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function(){
     setupCollapsibleSections();
+    expandRequestedSections();
     loadUnenrolledSurveys();
     loadAllSurveys();
   });

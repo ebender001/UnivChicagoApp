@@ -234,7 +234,7 @@
     container.appendChild(item);
   }
 
-  function addFrailtyDetailRow(body, label, details){
+  function addFrailtyDetailRow(body, label, details, expanded){
     var row = document.createElement('tr');
     var detailsId = 'frailty-detail-' + label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var cell = document.createElement('td');
@@ -242,9 +242,10 @@
     var list = document.createElement('dl');
 
     row.id = detailsId;
-    row.className = 'frailty-detail-row';
+    row.className = expanded ? 'frailty-detail-row is-visible' : 'frailty-detail-row';
     cell.colSpan = 2;
     panel.className = 'frailty-detail-panel';
+    if(expanded) panel.style.height = 'auto';
     list.className = 'frailty-detail-list';
 
     details.forEach(function(detail){
@@ -265,7 +266,7 @@
     body.appendChild(row);
   }
 
-  function addFrailtyRow(body, label, value, className, details){
+  function addFrailtyRow(body, label, value, className, details, expanded){
     var row = document.createElement('tr');
     if(className) row.className = className;
 
@@ -281,7 +282,7 @@
 
       button.type = 'button';
       button.className = 'frailty-detail-toggle';
-      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       button.setAttribute('aria-controls', detailsId);
       button.innerHTML = '<span class="collapse-indicator" aria-hidden="true">+</span><span>' + label + '</span>';
       labelCell.appendChild(button);
@@ -322,7 +323,7 @@
     body.appendChild(row);
 
     if(details && details.length){
-      addFrailtyDetailRow(body, label, details);
+      addFrailtyDetailRow(body, label, details, expanded);
     }
   }
 
@@ -338,7 +339,10 @@
     body.appendChild(row);
   }
 
-  function renderFrailty(container, enrollee, survey){
+  function renderFrailty(container, enrollee, survey, options){
+    options = options || {};
+    var expandDetails = options.expandDetails === true;
+
     if(!container) return;
 
     container.textContent = '';
@@ -367,7 +371,7 @@
     addFrailtySeparator(body);
 
     scores.factors.forEach(function(factor){
-      addFrailtyRow(body, factor.label, String(factor.score), '', factor.details);
+      addFrailtyRow(body, factor.label, String(factor.score), '', factor.details, expandDetails);
     });
 
     table.appendChild(body);

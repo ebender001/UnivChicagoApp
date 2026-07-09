@@ -25,7 +25,7 @@
 
     if(frailty) frailty.hidden = false;
     if(surveySection) surveySection.hidden = false;
-    detailRenderer.renderFrailty(frailtyContainer, enrollee, survey);
+    detailRenderer.renderFrailty(frailtyContainer, enrollee, survey, { expandDetails: true });
     detailRenderer.renderSurvey(surveyContainer, survey);
   }
 
