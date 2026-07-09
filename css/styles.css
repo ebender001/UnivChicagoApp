@@ -115,6 +115,9 @@ body.login-required{ overflow:hidden; }
 .card{ background:var(--card); padding:1.5rem; border-radius:var(--radius); border:1px solid #dddddd; box-shadow:0 1px 4px rgba(12,12,12,0.04); }
 .welcome-card{ display:flex; flex-direction:column; gap:0.75rem; margin:1rem 0; }
 .dashboard-actions{ display:flex; gap:0.75rem; flex-wrap:wrap; margin:0; }
+.dashboard-guides{ display:flex; flex-direction:column; gap:0.75rem; margin:1rem 0; }
+.dashboard-guides .muted{ margin:0; }
+.dashboard-guide-actions{ display:flex; gap:0.75rem; flex-wrap:wrap; }
 .dashboard-card-link{ display:block; color:inherit; text-decoration:none; }
 .dashboard-card-link:hover,
 .dashboard-card-link:focus{ border-color:var(--accent); outline:none; box-shadow:0 0 0 3px rgba(128,0,0,0.12); }
@@ -506,6 +509,14 @@ input:focus-visible{
 }
 .pin-panel h2{ margin:0; color:var(--accent); font-size:1.45rem; line-height:1.25; }
 .pin-panel p{ margin:0; }
+.registration-saved-panel{ text-align:center; }
+.registration-saved-actions{
+  display:grid;
+  gap:0.75rem;
+}
+.registration-saved-actions .btn{
+  width:100%;
+}
 .qr-overlay{
   position:fixed;
   inset:0;
@@ -872,6 +883,7 @@ input:focus-visible{
   .gait-manual-grid{ grid-template-columns: 1fr; }
   .three-field-row{ grid-template-columns: 1fr; }
   .dashboard-actions{ display:grid; grid-template-columns: 1fr; }
+  .dashboard-guide-actions{ display:grid; grid-template-columns: 1fr; }
   .container{ padding:1rem; }
   .card{ padding:1rem; }
   .page-title{ font-size:1.65rem; }

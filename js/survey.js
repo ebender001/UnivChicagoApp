@@ -2,6 +2,8 @@
 // Handles the simple survey form behavior and collects form values.
 
 (function(){
+  var surveyCompletionOverlayId = 'survey-completion-overlay';
+
   function collectForm(form){
     // Build a plain object from form fields; easy to extend with new fields later
     var data = {};
@@ -26,29 +28,64 @@
     box.hidden = false;
   }
 
-  function showCompletionOverlay(){
+  function closeCompletionOverlay(){
+    var overlay = document.getElementById(surveyCompletionOverlayId);
+    if(!overlay) return;
+    overlay.hidden = true;
+  }
+
+  function createCompletionOverlay(){
     var overlay = document.createElement('div');
+    overlay.id = surveyCompletionOverlayId;
     overlay.className = 'survey-completion-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-labelledby', 'survey-completion-title');
     overlay.innerHTML = [
       '<div class="survey-completion-panel">',
-      '<h2 id="survey-completion-title">Thank you for completing the survey!</h2>',
-      '<p>Give the iPad to the Medical Assistant to continue your registration.</p>',
+      '<h2 id="survey-completion-title"></h2>',
+      '<p id="survey-completion-message"></p>',
       '<button type="button" class="btn primary" id="survey-completion-ok">OK</button>',
       '</div>'
     ].join('');
 
     document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(ev){
+      if(ev.target === overlay) closeCompletionOverlay();
+    });
+    overlay.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape') closeCompletionOverlay();
+    });
+    return overlay;
+  }
 
+  function ensureCompletionOverlay(){
+    return document.getElementById(surveyCompletionOverlayId) || createCompletionOverlay();
+  }
+
+  function showCompletionOverlay(options){
+    var overlay = ensureCompletionOverlay();
+    var title = document.getElementById('survey-completion-title');
+    var message = document.getElementById('survey-completion-message');
     var okButton = document.getElementById('survey-completion-ok');
-    if(okButton){
-      okButton.focus();
-      okButton.addEventListener('click', function(){
-        window.location.href = 'surveys.html?expandUnenrolled=1';
-      });
-    }
+    if(!overlay || !title || !message || !okButton) return;
+
+    title.textContent = options.title;
+    message.textContent = options.message;
+    overlay.hidden = false;
+    okButton.focus();
+    okButton.onclick = function(){
+      window.location.href = options.redirectUrl;
+    };
+  }
+
+  function hasLinkedEnrollee(result, payload){
+    return Boolean(
+      (payload && payload.enrolleeId)
+      || (result && result.enrolleeId)
+      || (result && result.enrollee && result.enrollee.objectId)
+      || (result && result.survey && result.survey.enrollee && result.survey.enrollee.objectId)
+    );
   }
 
   function setSubmitState(form, saving){
@@ -295,7 +332,20 @@
         survey: payload
       }).then(function(result){
         console.log('Survey saved:', result);
-        showCompletionOverlay();
+        if(hasLinkedEnrollee(result, payload)){
+          showCompletionOverlay({
+            title: 'Registration and survey complete',
+            message: 'BeFitMe Enrollee Registration and BeFitMe Survey are both complete.',
+            redirectUrl: 'enrollees.html'
+          });
+          return;
+        }
+
+        showCompletionOverlay({
+          title: 'Thank you for completing the survey!',
+          message: 'Give the iPad to the Medical Assistant to continue your registration.',
+          redirectUrl: 'surveys.html?expandUnenrolled=1'
+        });
       }).catch(function(error){
         console.log('Survey save failed:', error);
         showError(error && error.message ? error.message : 'Unable to save survey.');

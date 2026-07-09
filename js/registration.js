@@ -2,6 +2,8 @@
 // Handles enrollee registration page behavior.
 
 (function(){
+  var registrationSavedOverlayId = 'registration-saved-overlay';
+
   function generateEnrolleeNumber(){
     return String(Math.floor(Math.random() * 90000000) + 10000000);
   }
@@ -410,6 +412,99 @@
     status.classList.toggle('success', !isError);
   }
 
+  function hideRegistrationStatus(){
+    var status = document.getElementById('registration-status');
+    if(!status) return;
+
+    status.hidden = true;
+    status.textContent = '';
+    status.classList.remove('form-error', 'success');
+  }
+
+  function closeRegistrationSavedOverlay(){
+    var overlay = document.getElementById(registrationSavedOverlayId);
+    if(!overlay) return;
+    overlay.hidden = true;
+  }
+
+  function createRegistrationSavedOverlay(){
+    var overlay = document.createElement('div');
+    overlay.id = registrationSavedOverlayId;
+    overlay.className = 'pin-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'registration-saved-title');
+    overlay.hidden = true;
+    overlay.innerHTML = [
+      '<div class="pin-panel registration-saved-panel">',
+      '<h2 id="registration-saved-title">Registration saved</h2>',
+      '<p id="registration-saved-message">Proceed to Surveys page to complete patient information.</p>',
+      '<div class="registration-saved-actions">',
+      '<button type="button" class="btn primary" id="registration-saved-ok">OK</button>',
+      '</div>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function(ev){
+      if(ev.target === overlay) closeRegistrationSavedOverlay();
+    });
+
+    overlay.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape') closeRegistrationSavedOverlay();
+    });
+
+    return overlay;
+  }
+
+  function ensureRegistrationSavedOverlay(){
+    return document.getElementById(registrationSavedOverlayId) || createRegistrationSavedOverlay();
+  }
+
+  function resolveSavedEnrolleeId(result, payload){
+    if(result && result.enrollee && result.enrollee.objectId) return result.enrollee.objectId;
+    if(result && result.objectId) return result.objectId;
+    if(result && result.enrolleeId) return result.enrolleeId;
+    if(result && result.id) return result.id;
+    if(payload && payload.enrolleeId) return payload.enrolleeId;
+    if(editingEnrolleeId) return editingEnrolleeId;
+    return '';
+  }
+
+  function showRegistrationSavedOverlay(enrolleeId){
+    showRegistrationCompletionOverlay({
+      title: 'Registration saved',
+      message: 'Proceed to Surveys page to complete patient information.',
+      redirectUrl: 'survey.html?enrolleeId=' + encodeURIComponent(enrolleeId)
+    });
+  }
+
+  function showRegistrationCompletionOverlay(options){
+    var overlay = ensureRegistrationSavedOverlay();
+    var title = document.getElementById('registration-saved-title');
+    var message = document.getElementById('registration-saved-message');
+    var okButton = document.getElementById('registration-saved-ok');
+    if(!overlay || !title || !message || !okButton) return;
+
+    title.textContent = options.title;
+    message.textContent = options.message;
+    overlay.hidden = false;
+    okButton.focus();
+    okButton.onclick = function(){
+      window.location.href = options.redirectUrl;
+    };
+  }
+
+  function bothRegistrationAndSurveyComplete(result, payload){
+    return Boolean(
+      (payload && payload.surveyId)
+      || (result && result.surveyId)
+      || (result && result.survey && result.survey.objectId)
+      || (result && result.enrollee && result.enrollee.fields && result.enrollee.fields.survey && result.enrollee.fields.survey.objectId)
+    );
+  }
+
   function setFieldValue(id, value){
     var field = document.getElementById(id);
     if(!field) return;
@@ -422,6 +517,26 @@
 
     if(!startDate || !stopDate) return true;
     return Boolean(startDate.value && stopDate.value);
+  }
+
+  function stopDateIsAfterStartDate(){
+    var startDate = document.getElementById('start-date');
+    var stopDate = document.getElementById('stop-date');
+
+    if(!startDate || !stopDate || !startDate.value || !stopDate.value) return true;
+    return stopDate.value > startDate.value;
+  }
+
+  function syncDateValidity(){
+    var startDate = document.getElementById('start-date');
+    var stopDate = document.getElementById('stop-date');
+    if(!startDate || !stopDate) return;
+
+    var message = stopDateIsAfterStartDate()
+      ? ''
+      : 'Stop date must be later than start date.';
+
+    stopDate.setCustomValidity(message);
   }
 
   function formatDateInput(value){
@@ -546,6 +661,8 @@
     var form = document.querySelector('.registration-page form');
     var input = document.getElementById('enrollee-number');
     var button = document.getElementById('generate-enrollee-number');
+    var startDate = document.getElementById('start-date');
+    var stopDate = document.getElementById('stop-date');
     var params = new URLSearchParams(window.location.search);
     editingEnrolleeId = params.get('enrolleeId');
 
@@ -555,6 +672,9 @@
         input.focus();
       });
     }
+
+    if(startDate) startDate.addEventListener('input', syncDateValidity);
+    if(stopDate) stopDate.addEventListener('input', syncDateValidity);
 
     document.querySelectorAll('input[name="canCompleteGripTest"]').forEach(function(choice){
       choice.addEventListener('change', syncGripTestFollowUp);
@@ -572,6 +692,7 @@
     });
     syncGripTestFollowUp();
     syncGaitTestFollowUp();
+    syncDateValidity();
 
     if(editingEnrolleeId){
       loadEnrolleeForEditing(editingEnrolleeId);
@@ -582,6 +703,7 @@
         window.setTimeout(function(){
           syncGripTestFollowUp();
           syncGaitTestFollowUp();
+          syncDateValidity();
         }, 0);
       });
 
@@ -590,6 +712,14 @@
 
         if(!datesAreComplete()){
           showRegistrationStatus('Start date and stop date are required before submitting.', true);
+          form.reportValidity();
+          return;
+        }
+
+        syncDateValidity();
+
+        if(!stopDateIsAfterStartDate()){
+          showRegistrationStatus('Stop date must be later than start date.', true);
           form.reportValidity();
           return;
         }
@@ -612,7 +742,24 @@
           enrollee: payload
         }).then(function(result){
           console.log('Enrollee saved:', result);
-          showRegistrationStatus('Registration saved.', false);
+          var hasCompletedBoth = bothRegistrationAndSurveyComplete(result, payload);
+          var savedEnrolleeId = resolveSavedEnrolleeId(result, payload);
+          hideRegistrationStatus();
+          if(hasCompletedBoth){
+            showRegistrationCompletionOverlay({
+              title: 'Registration and survey complete',
+              message: 'BeFitMe Enrollee Registration and BeFitMe Survey are both complete.',
+              redirectUrl: 'enrollees.html'
+            });
+            return;
+          }
+
+          if(!savedEnrolleeId){
+            showRegistrationStatus('Registration saved, but the survey link could not be created. Please open Surveys manually.', true);
+            return;
+          }
+
+          showRegistrationSavedOverlay(savedEnrolleeId);
         }).catch(function(error){
           console.log('Enrollee save failed:', error);
           showRegistrationStatus(error && error.message ? error.message : 'Unable to save registration.', true);
