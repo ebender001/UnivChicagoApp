@@ -129,6 +129,19 @@
     return select.options.length > 0;
   }
 
+  function selectOptionByName(selectId, name){
+    var select = document.getElementById(selectId);
+    if(!select || !name) return;
+
+    var target = String(name).trim().toLowerCase();
+    Array.prototype.some.call(select.options, function(option, index){
+      var optionName = option && option.dataset ? option.dataset.name : '';
+      if(String(optionName || '').trim().toLowerCase() !== target) return false;
+      select.selectedIndex = index;
+      return true;
+    });
+  }
+
   function setSubmitState(form, saving){
     var submit = form.querySelector('[type="submit"]');
     if(!submit) return;
@@ -177,6 +190,9 @@
       if(!hasInstitutions || !hasSpecialties){
         throw new Error('Institution and specialty options are required before inviting users.');
       }
+
+      selectOptionByName('invite-institution', 'University of Chicago');
+      selectOptionByName('invite-specialty', 'Thoracic Surgery');
 
       var status = document.getElementById('invite-status');
       if(status && status.textContent === 'Loading invite options...') status.hidden = true;
