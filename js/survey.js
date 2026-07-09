@@ -88,6 +88,14 @@
     );
   }
 
+  function getSavedSurveyId(result){
+    if(result && result.surveyId) return result.surveyId;
+    if(result && result.survey && result.survey.objectId) return result.survey.objectId;
+    if(result && result.objectId) return result.objectId;
+    if(result && result.id) return result.id;
+    return '';
+  }
+
   function setSubmitState(form, saving){
     var submit = form.querySelector('[type="submit"]');
     if(!submit) return;
@@ -341,10 +349,16 @@
           return;
         }
 
+        var savedSurveyId = getSavedSurveyId(result);
+        var redirectUrl = 'surveys.html?expandUnenrolled=1';
+        if(savedSurveyId){
+          redirectUrl += '&highlightSurveyId=' + encodeURIComponent(savedSurveyId);
+        }
+
         showCompletionOverlay({
           title: 'Thank you for completing the survey!',
           message: 'Give the iPad to the Medical Assistant to continue your registration.',
-          redirectUrl: 'surveys.html?expandUnenrolled=1'
+          redirectUrl: redirectUrl
         });
       }).catch(function(error){
         console.log('Survey save failed:', error);

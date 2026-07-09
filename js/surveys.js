@@ -2,6 +2,8 @@
 // Loads survey lists.
 
 (function(){
+  var highlightSurveyId = '';
+
   function formatDateTime(value){
     if(!value) return '';
 
@@ -52,6 +54,28 @@
     return cell;
   }
 
+  function emphasizeReturnedSurvey(row, surveyId){
+    if(!row || !surveyId) return;
+
+    row.classList.add('highlighted-survey-row');
+    row.setAttribute('tabindex', '-1');
+
+    var button = row.querySelector('.continue-enrollment-button');
+    if(button){
+      button.classList.add('highlighted-continue-enrollment-button');
+      button.setAttribute('aria-describedby', 'unenrolled-surveys-status');
+    }
+
+    setStatus('unenrolled-surveys-status', 'Survey ' + surveyId + ' is ready. Tap Continue Enrollment to finish registration.');
+
+    window.requestAnimationFrame(function(){
+      row.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    });
+  }
+
   function renderUnenrolledRows(surveys){
     var body = document.getElementById('unenrolled-surveys-table-body');
     var wrap = document.getElementById('unenrolled-surveys-table-wrap');
@@ -65,6 +89,10 @@
       row.appendChild(createCell(survey.objectId));
       row.appendChild(createActionCell(survey));
       body.appendChild(row);
+
+      if(highlightSurveyId && survey && survey.objectId === highlightSurveyId){
+        emphasizeReturnedSurvey(row, survey.objectId);
+      }
     });
 
     wrap.hidden = false;
@@ -190,6 +218,7 @@
 
   function expandRequestedSections(){
     var params = new URLSearchParams(window.location.search);
+    highlightSurveyId = params.get('highlightSurveyId') || '';
     if(params.get('expandUnenrolled') !== '1') return;
 
     var button = document.querySelector('[aria-controls="unenrolled-surveys-panel"][data-collapse-toggle]');

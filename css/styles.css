@@ -662,6 +662,12 @@ input:focus-visible{
 .data-table td{ padding:0.75rem; border-bottom:1px solid #dddddd; text-align:left; vertical-align:middle; }
 .data-table th{ color:var(--accent); font-size:0.95rem; background:#fafafa; }
 .data-table tbody tr:last-child td{ border-bottom:0; }
+.data-table tbody tr.highlighted-survey-row{
+  animation:survey-highlight-pulse 1.8s ease-out 1;
+}
+.data-table tbody tr.highlighted-survey-row td{
+  font-weight:800;
+}
 .clickable-enrollee-row{ cursor:pointer; }
 .clickable-enrollee-row:hover td,
 .clickable-enrollee-row:focus-visible td{ background:#fff8f6; }
@@ -671,6 +677,12 @@ input:focus-visible{
 }
 .table-action-button{ min-height:40px; padding:0.45rem 0.7rem; font-size:0.9rem; }
 .continue-enrollment-button{ border-color:var(--accent); color:var(--accent); }
+.highlighted-continue-enrollment-button{
+  border-color:#12703d;
+  background:#12703d;
+  color:#ffffff;
+  box-shadow:0 0 0 4px rgba(18,112,61,0.18);
+}
 .start-survey-button{ border-color:var(--accent); color:var(--accent); }
 .icon-button{
   display:inline-flex;
@@ -892,5 +904,16 @@ input:focus-visible{
 
 /* Accessibility helpers */
 .sr-only{ position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+@keyframes survey-highlight-pulse{
+  0%{
+    background:rgba(128,0,0,0.2);
+    box-shadow:inset 5px 0 0 var(--accent), 0 0 0 0 rgba(128,0,0,0.16);
+  }
+  100%{
+    background:linear-gradient(90deg, rgba(128,0,0,0.14), rgba(128,0,0,0.03));
+    box-shadow:inset 5px 0 0 var(--accent), 0 0 0 12px rgba(128,0,0,0);
+  }
+}
 
 /* Future styles: add classes for tables, charts, forms, error states */
