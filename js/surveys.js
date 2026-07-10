@@ -4,6 +4,14 @@
 (function(){
   var highlightSurveyId = '';
 
+  function isViewerRole(){
+    var user = window.BeFitMeAuth && typeof window.BeFitMeAuth.getStoredCurrentUser === 'function'
+      ? window.BeFitMeAuth.getStoredCurrentUser()
+      : null;
+    var role = user && typeof user.role === 'string' ? user.role.trim().toLowerCase() : '';
+    return role === 'viewer';
+  }
+
   function formatDateTime(value){
     if(!value) return '';
 
@@ -42,14 +50,21 @@
   function createActionCell(survey){
     var cell = document.createElement('td');
     var button = document.createElement('button');
+    var viewerRole = isViewerRole();
     button.type = 'button';
     button.className = 'btn table-action-button continue-enrollment-button';
     button.textContent = 'Continue Enrollment';
     button.setAttribute('aria-label', 'Continue enrollment for survey ' + survey.objectId);
-    button.addEventListener('click', function(){
-      // Continue Enrollment carries the survey id so registration can create both pointers.
-      window.location.href = 'enrollee-registration.html?surveyId=' + encodeURIComponent(survey.objectId);
-    });
+    if(viewerRole){
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.title = 'Your role does not allow continuing enrollment.';
+    }else{
+      button.addEventListener('click', function(){
+        // Continue Enrollment carries the survey id so registration can create both pointers.
+        window.location.href = 'enrollee-registration.html?surveyId=' + encodeURIComponent(survey.objectId);
+      });
+    }
     cell.appendChild(button);
     return cell;
   }
@@ -66,7 +81,11 @@
       button.setAttribute('aria-describedby', 'unenrolled-surveys-status');
     }
 
-    setStatus('unenrolled-surveys-status', 'Survey ' + surveyId + ' is ready. Tap Continue Enrollment to finish registration.');
+    if(isViewerRole()){
+      setStatus('unenrolled-surveys-status', 'Survey ' + surveyId + ' needs enrollment registration, but your role cannot continue enrollment.');
+    }else{
+      setStatus('unenrolled-surveys-status', 'Survey ' + surveyId + ' is ready. Tap Continue Enrollment to finish registration.');
+    }
 
     window.requestAnimationFrame(function(){
       row.scrollIntoView({

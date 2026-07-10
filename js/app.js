@@ -688,9 +688,21 @@
     return location.pathname.endsWith('survey.html');
   }
 
+  function isNewEnrolleeRegistrationPage(){
+    if(!location.pathname.endsWith('enrollee-registration.html')) return false;
+
+    var params = new URLSearchParams(location.search);
+    return !params.get('surveyId') && !params.get('enrolleeId');
+  }
+
   function isSurveyHref(href){
     if(!href) return false;
     return href === 'survey.html' || href.endsWith('/survey.html');
+  }
+
+  function isNewEnrolleeRegistrationHref(href){
+    if(!href) return false;
+    return href === 'enrollee-registration.html' || href.endsWith('/enrollee-registration.html');
   }
 
   function isPublicHref(href){
@@ -711,6 +723,7 @@
     if(isPublicHref(href)) return true;
     if(!hasActiveLogin()) return false;
     if(isSurveyHref(href) && isViewerRole()) return false;
+    if(isNewEnrolleeRegistrationHref(href) && isViewerRole()) return false;
     return true;
   }
 
@@ -718,6 +731,10 @@
     var href = link && link.getAttribute ? link.getAttribute('href') : '';
     if(isSurveyHref(href) && isViewerRole()){
       return 'Your role does not allow starting a new survey.';
+    }
+
+    if(isNewEnrolleeRegistrationHref(href) && isViewerRole()){
+      return 'Your role does not allow registering a new patient.';
     }
 
     if(link && link.dataset && link.dataset.loginAlert){
@@ -728,9 +745,16 @@
   }
 
   function enforcePageAccess(){
-    if(!isSurveyPage()) return;
-    if(hasActiveLogin() && isViewerRole()){
+    if(!hasActiveLogin() || !isViewerRole()) return;
+
+    if(isSurveyPage()){
       window.alert('Your role does not allow starting a new survey.');
+      window.location.href = 'index.html';
+      return;
+    }
+
+    if(isNewEnrolleeRegistrationPage()){
+      window.alert('Your role does not allow registering a new patient.');
       window.location.href = 'index.html';
     }
   }
@@ -755,9 +779,15 @@
     links.forEach(function(link){
       var href = link.getAttribute('href');
       var isDisabled = !canAccessHref(href);
+      var accessMessage = isDisabled ? getLinkAccessMessage(link) : '';
       link.classList.toggle('is-disabled', isDisabled);
       link.setAttribute('aria-disabled', String(isDisabled));
       link.tabIndex = isDisabled ? -1 : 0;
+      if(accessMessage){
+        link.setAttribute('title', accessMessage);
+      }else{
+        link.removeAttribute('title');
+      }
     });
   }
 
