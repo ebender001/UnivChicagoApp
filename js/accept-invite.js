@@ -72,7 +72,7 @@
       '<h2 id="new-user-pin-title">New User PIN</h2>',
       '<p>Your watch app PIN is:</p>',
       '<div class="pin-display">' + pin + '</div>',
-      '<p class="pin-reminder">Please remember this PIN. It will be needed for Watch app admin login.</p>',
+      '<p class="pin-reminder">If you will be setting up the watch app, please remember this PIN. You can regenerate the PIN from your Admin My Info link.</p>',
       '<button type="button" class="btn primary" id="new-user-pin-ok">OK</button>',
       '</div>'
     ].join('');
