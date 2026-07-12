@@ -332,6 +332,20 @@
     return '';
   }
 
+  function escapeHtml(value){
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function getUserDisplayName(user){
+    if(!user) return '';
+    return String(user.name || user.username || user.email || '').trim();
+  }
+
   function updateHeaderProfile(profile){
     var wrapper = document.querySelector('[data-header-profile]');
     var specialty = document.querySelector('[data-header-specialty]');
@@ -596,10 +610,157 @@
   function logoutUser(options){
     clearLoginState();
     closeLogin();
+    closeHeaderAccountMenu();
     hideAuthNotice();
     updateAuthState();
     console.log('Logout successful');
     if(options && options.redirect) redirectAfterLogout();
+  }
+
+  function closeMyInfoOverlay(){
+    var overlay = document.getElementById('my-info-overlay');
+    if(overlay) overlay.remove();
+  }
+
+  function showGeneratedPin(pin){
+    var result = document.getElementById('my-info-pin-result');
+    if(!result) return;
+
+    result.innerHTML = [
+      '<p>Your new PIN is:</p>',
+      '<div class="pin-display">' + escapeHtml(pin) + '</div>',
+      '<p class="pin-reminder">Please remember this PIN. It will be needed for Watch app admin login.</p>'
+    ].join('');
+    result.hidden = false;
+  }
+
+  function setPinSubmitState(form, saving){
+    var submit = form.querySelector('[type="submit"]');
+    if(!submit) return;
+
+    submit.disabled = saving;
+    submit.textContent = saving ? 'Generating...' : 'Generate New PIN';
+  }
+
+  function showMyInfoStatus(message, isError){
+    var status = document.getElementById('my-info-status');
+    if(!status) return;
+
+    status.textContent = message;
+    status.hidden = false;
+    status.classList.toggle('form-error', Boolean(isError));
+    status.classList.toggle('success', !isError);
+  }
+
+  function createMyInfoOverlay(){
+    var user = getStoredCurrentUser();
+    var institutionName = getProfileName(user && user.institution) || 'Not set';
+    var specialtyName = getProfileName(user && user.specialty) || 'Not set';
+    var username = user && user.username ? user.username : '';
+    var overlay = document.createElement('div');
+
+    overlay.id = 'my-info-overlay';
+    overlay.className = 'pin-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'my-info-title');
+    overlay.innerHTML = [
+      '<div class="pin-panel my-info-panel">',
+      '<h2 id="my-info-title">My Info</h2>',
+      '<dl class="my-info-list">',
+      '<div><dt>Institution</dt><dd>' + escapeHtml(institutionName) + '</dd></div>',
+      '<div><dt>Specialty</dt><dd>' + escapeHtml(specialtyName) + '</dd></div>',
+      '</dl>',
+      '<form id="generate-pin-form" class="survey-form pin-credential-form">',
+      '<div class="form-row">',
+      '<label for="pin-username">Username or Email</label>',
+      '<input type="text" id="pin-username" name="username" autocomplete="username" value="' + escapeHtml(username) + '" required />',
+      '</div>',
+      '<div class="form-row">',
+      '<label for="pin-password">Password</label>',
+      '<input type="password" id="pin-password" name="password" autocomplete="current-password" required />',
+      '</div>',
+      '<div class="form-actions pin-form-actions">',
+      '<button type="submit" class="btn primary">Generate New PIN</button>',
+      '</div>',
+      '</form>',
+      '<div id="my-info-pin-result" class="pin-result" hidden></div>',
+      '<div id="my-info-status" role="status" aria-live="polite" hidden></div>',
+      '<button type="button" class="btn" id="close-my-info">Close</button>',
+      '</div>'
+    ].join('');
+
+    document.body.appendChild(overlay);
+  }
+
+  function openMyInfo(){
+    if(!hasActiveLogin()){
+      window.alert('Please log in to view your information.');
+      return;
+    }
+
+    closeMyInfoOverlay();
+    createMyInfoOverlay();
+
+    var overlay = document.getElementById('my-info-overlay');
+    var form = document.getElementById('generate-pin-form');
+    var close = document.getElementById('close-my-info');
+
+    if(close){
+      close.addEventListener('click', closeMyInfoOverlay);
+      close.focus();
+    }
+
+    if(overlay){
+      overlay.addEventListener('click', function(ev){
+        if(ev.target === overlay) closeMyInfoOverlay();
+      });
+    }
+
+    if(form){
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+
+        if(!form.checkValidity()){
+          form.reportValidity();
+          return;
+        }
+
+        var username = document.getElementById('pin-username').value.trim();
+        var password = document.getElementById('pin-password').value;
+        setPinSubmitState(form, true);
+
+        runCloudFunction('generateDashboardUserPIN', {
+          username: username,
+          password: password
+        }).then(function(result){
+          console.log('Dashboard user PIN generated:', result);
+          form.reset();
+          form.hidden = true;
+          showGeneratedPin(result && result.pin);
+          var closeButton = document.getElementById('close-my-info');
+          if(closeButton) closeButton.focus();
+        }).catch(function(error){
+          console.log('Dashboard user PIN generation failed:', error);
+          showMyInfoStatus(error && error.message ? error.message : 'Unable to generate PIN.', true);
+        }).finally(function(){
+          setPinSubmitState(form, false);
+        });
+      });
+    }
+  }
+
+  function setHeaderAccountMenuOpen(isOpen){
+    var toggle = document.querySelector('[data-account-toggle]');
+    var dropdown = document.querySelector('[data-account-dropdown]');
+    if(!toggle || !dropdown) return;
+
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    dropdown.hidden = !isOpen;
+  }
+
+  function closeHeaderAccountMenu(){
+    setHeaderAccountMenuOpen(false);
   }
 
   function createSessionTimeoutOverlay(){
@@ -761,20 +922,29 @@
 
   function updateHeaderVisibility(){
     var mainNav = document.querySelector('.main-nav');
-    var authButton = document.querySelector('[data-auth-button]');
+    var authWrap = document.querySelector('[data-header-auth]');
     // Survey is a patient-facing flow, so dashboard navigation stays out of view there.
     var hideControls = isSurveyPage();
 
     if(mainNav) mainNav.hidden = hideControls;
-    if(authButton) authButton.hidden = hideControls;
+    if(authWrap) authWrap.hidden = hideControls;
   }
 
   function updateAuthState(){
     var isLoggedIn = hasActiveLogin();
     var authButton = document.querySelector('[data-auth-button]');
+    var accountMenu = document.querySelector('[data-account-menu]');
+    var accountName = document.querySelector('[data-account-name]');
     var links = document.querySelectorAll('a[href]');
 
-    if(authButton) authButton.textContent = isLoggedIn ? 'Log Out' : 'Login';
+    if(authButton){
+      authButton.textContent = 'Login';
+      authButton.hidden = isLoggedIn;
+    }
+
+    if(accountMenu) accountMenu.hidden = !isLoggedIn;
+    if(accountName) accountName.textContent = getUserDisplayName(getStoredCurrentUser()) || 'Account';
+    if(!isLoggedIn) closeHeaderAccountMenu();
 
     links.forEach(function(link){
       var href = link.getAttribute('href');
@@ -793,19 +963,51 @@
 
   function setupHeaderAuth(){
     var authButton = document.querySelector('[data-auth-button]');
-    if(!authButton) return;
+    var accountToggle = document.querySelector('[data-account-toggle]');
+    var myInfoButton = document.querySelector('[data-account-my-info]');
+    var logoutButton = document.querySelector('[data-account-logout]');
 
-    authButton.addEventListener('click', function(){
-      if(hasActiveLogin()){
+    if(authButton){
+      authButton.addEventListener('click', function(){
+        openLogin();
+      });
+    }
+
+    if(accountToggle){
+      accountToggle.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var isOpen = accountToggle.getAttribute('aria-expanded') === 'true';
+        setHeaderAccountMenuOpen(!isOpen);
+      });
+    }
+
+    if(myInfoButton){
+      myInfoButton.addEventListener('click', function(){
+        closeHeaderAccountMenu();
+        openMyInfo();
+      });
+    }
+
+    if(logoutButton){
+      logoutButton.addEventListener('click', function(){
+        closeHeaderAccountMenu();
         if(!window.confirm('Log out of BeFitMe?')){
           return;
         }
 
         logoutUser({ redirect: true });
-        return;
-      }
+      });
+    }
 
-      openLogin();
+    document.addEventListener('click', function(ev){
+      var menuWrap = document.querySelector('[data-account-menu]');
+      if(!menuWrap || menuWrap.hidden) return;
+      if(ev.target.closest('[data-account-menu]')) return;
+      closeHeaderAccountMenu();
+    });
+
+    document.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape') closeHeaderAccountMenu();
     });
 
     updateAuthState();
@@ -966,7 +1168,8 @@
     runCloudFunction: runCloudFunction,
     runPublicCloudFunction: runPublicCloudFunction,
     hasActiveLogin: hasActiveLogin,
-    getStoredCurrentUser: getStoredCurrentUser
+    getStoredCurrentUser: getStoredCurrentUser,
+    openMyInfo: openMyInfo
   };
 
   document.addEventListener('DOMContentLoaded', function(){
