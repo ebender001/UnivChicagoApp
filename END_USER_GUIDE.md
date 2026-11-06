@@ -6,7 +6,7 @@ This guide explains how to use the BeFitMe website for everyday tasks such as lo
 
 1. Open the BeFitMe website in your browser.
 2. In the top-right corner of the page, click the Login button.
-3. Enter your username or email address and password.
+3. Enter your username or email address and password. Usernames are not case sensitive; passwords are.
 4. Click Log in.
 5. If you are logged in successfully, the header button changes to Log Out.
 
@@ -83,6 +83,16 @@ User management is available from the Admin page.
 3. Enter the user email, name, role, institution, and specialty.
 4. Click Send Invite.
 5. The system sends an invitation for the new dashboard user.
+
+### Resend an invitation
+Use this if an invited user did not receive the email, cannot find it, or the link has expired.
+1. Go to Admin.
+2. Open the Users section.
+3. In the Inactive Users table, find the user who has not accepted their invitation.
+4. Click Resend Invite next to their name.
+5. The system sends a new invitation email. The new link is valid for 7 days, and any earlier link stops working.
+
+The Resend Invite button appears only for users with a pending invitation. You can resend as many times as needed.
 
 ### View users
 1. Go to Admin.
