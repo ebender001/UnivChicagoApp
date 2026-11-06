@@ -315,6 +315,33 @@
     wrap.hidden = !institutions.length;
   }
 
+  function createUserResendButton(user){
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn';
+    button.textContent = 'Resend Invite';
+    button.setAttribute('aria-label', 'Resend invitation to ' + user.name);
+
+    button.addEventListener('click', function(){
+      button.disabled = true;
+      button.textContent = 'Sending...';
+      window.BeFitMeAuth.runCloudFunction('resendDashboardUserInvite', {
+        userId: user.objectId,
+        activationBaseUrl: activationBaseUrl()
+      }).then(function(){
+        setInactiveUserListStatus('Invitation re-sent to ' + user.name + '.');
+      }).catch(function(error){
+        console.log('Invite resend failed:', error);
+        setInactiveUserListStatus(error && error.message ? error.message : 'Unable to resend invitation.');
+      }).finally(function(){
+        button.disabled = false;
+        button.textContent = 'Resend Invite';
+      });
+    });
+
+    return button;
+  }
+
   function renderUsers(users, options){
     var body = document.getElementById(options.bodyId);
     var wrap = document.getElementById(options.wrapId);
@@ -341,6 +368,10 @@
       row.appendChild(specialtyCell);
       if(options.showDelete){
         actionCell.appendChild(createUserDeleteButton(user));
+        row.appendChild(actionCell);
+      }
+      if(options.showResend){
+        if(user.hasPendingInvite) actionCell.appendChild(createUserResendButton(user));
         row.appendChild(actionCell);
       }
       body.appendChild(row);
@@ -421,6 +452,7 @@
         bodyId: 'inactive-users-list-body',
         wrapId: 'inactive-users-list-wrap',
         showDelete: false,
+        showResend: true,
         showRole: false
       });
 
