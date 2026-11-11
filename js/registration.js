@@ -4,10 +4,6 @@
 (function(){
   var registrationSavedOverlayId = 'registration-saved-overlay';
 
-  function generateEnrolleeNumber(){
-    return String(Math.floor(Math.random() * 90000000) + 10000000);
-  }
-
   var gaitTimers = {};
   var editingEnrolleeId = null;
   // Edit mode preserves original measurement values because grip and gait are read-only later.
@@ -511,34 +507,6 @@
     field.value = value === null || value === undefined ? '' : String(value);
   }
 
-  function datesAreComplete(){
-    var startDate = document.getElementById('start-date');
-    var stopDate = document.getElementById('stop-date');
-
-    if(!startDate || !stopDate) return true;
-    return Boolean(startDate.value && stopDate.value);
-  }
-
-  function stopDateIsAfterStartDate(){
-    var startDate = document.getElementById('start-date');
-    var stopDate = document.getElementById('stop-date');
-
-    if(!startDate || !stopDate || !startDate.value || !stopDate.value) return true;
-    return stopDate.value > startDate.value;
-  }
-
-  function syncDateValidity(){
-    var startDate = document.getElementById('start-date');
-    var stopDate = document.getElementById('stop-date');
-    if(!startDate || !stopDate) return;
-
-    var message = stopDateIsAfterStartDate()
-      ? ''
-      : 'Stop date must be later than start date.';
-
-    stopDate.setCustomValidity(message);
-  }
-
   function formatDateInput(value){
     if(!value) return '';
 
@@ -604,17 +572,12 @@
     var title = document.querySelector('.registration-page .page-title');
     var lead = document.querySelector('.registration-page .lead');
     var submit = document.querySelector('.registration-page form [type="submit"]');
-    var generateButton = document.getElementById('generate-enrollee-number');
 
     if(title) title.textContent = 'Edit Enrollee Registration';
     if(lead) lead.textContent = 'Update the enrollee registration details below.';
     if(submit) submit.textContent = 'Update';
-    if(generateButton) generateButton.disabled = true;
 
     // Existing enrollees can update registration details but not original test measurements.
-    setFieldValue('enrollee-number', fields.enrolleeNumber);
-    setFieldValue('start-date', formatDateInput(fields.startDate));
-    setFieldValue('stop-date', formatDateInput(fields.stopDate));
 
     existingGripCompleted = fields.gripCompleted === true ? true : fields.gripCompleted === false ? false : null;
     existingGaitCompleted = fields.gaitCompleted === true ? true : fields.gaitCompleted === false ? false : null;
@@ -659,22 +622,8 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     var form = document.querySelector('.registration-page form');
-    var input = document.getElementById('enrollee-number');
-    var button = document.getElementById('generate-enrollee-number');
-    var startDate = document.getElementById('start-date');
-    var stopDate = document.getElementById('stop-date');
     var params = new URLSearchParams(window.location.search);
     editingEnrolleeId = params.get('enrolleeId');
-
-    if(input && button){
-      button.addEventListener('click', function(){
-        input.value = generateEnrolleeNumber();
-        input.focus();
-      });
-    }
-
-    if(startDate) startDate.addEventListener('input', syncDateValidity);
-    if(stopDate) stopDate.addEventListener('input', syncDateValidity);
 
     document.querySelectorAll('input[name="canCompleteGripTest"]').forEach(function(choice){
       choice.addEventListener('change', syncGripTestFollowUp);
@@ -692,7 +641,6 @@
     });
     syncGripTestFollowUp();
     syncGaitTestFollowUp();
-    syncDateValidity();
 
     if(editingEnrolleeId){
       loadEnrolleeForEditing(editingEnrolleeId);
@@ -703,26 +651,11 @@
         window.setTimeout(function(){
           syncGripTestFollowUp();
           syncGaitTestFollowUp();
-          syncDateValidity();
         }, 0);
       });
 
       form.addEventListener('submit', function(ev){
         ev.preventDefault();
-
-        if(!datesAreComplete()){
-          showRegistrationStatus('Start date and stop date are required before submitting.', true);
-          form.reportValidity();
-          return;
-        }
-
-        syncDateValidity();
-
-        if(!stopDateIsAfterStartDate()){
-          showRegistrationStatus('Stop date must be later than start date.', true);
-          form.reportValidity();
-          return;
-        }
 
         if(!form.checkValidity()){
           form.reportValidity();
@@ -749,7 +682,7 @@
             showRegistrationCompletionOverlay({
               title: 'Registration and survey complete',
               message: 'BeFitMe Enrollee Registration and BeFitMe Survey are both complete.',
-              redirectUrl: 'enrollees.html'
+              redirectUrl: 'frailty-screenings.html'
             });
             return;
           }

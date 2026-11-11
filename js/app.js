@@ -145,12 +145,12 @@
       ],
       'surveys.html': [
         { label: 'Dashboard', href: 'index.html' },
-        { label: 'Surveys' }
+        { label: 'Survey Completed' }
       ],
       'survey.html': params.get('enrolleeId')
         ? [
           { label: 'Dashboard', href: 'index.html' },
-          { label: 'Enrollees', href: 'enrollees.html' },
+          { label: 'Gait and Grip Completed', href: 'enrollees.html' },
           { label: 'Survey' }
         ]
         : [
@@ -159,28 +159,32 @@
         ],
       'enrollees.html': [
         { label: 'Dashboard', href: 'index.html' },
-        { label: 'Enrollees' }
+        { label: 'Gait and Grip Completed' }
+      ],
+      'frailty-screenings.html': [
+        { label: 'Dashboard', href: 'index.html' },
+        { label: 'Survey and Gait and Grip Completed' }
       ],
       'enrollee-detail.html': [
         { label: 'Dashboard', href: 'index.html' },
-        { label: 'Enrollees', href: 'enrollees.html' },
+        { label: 'Survey and Gait and Grip Completed', href: 'frailty-screenings.html' },
         { label: 'Enrollee Detail' }
       ],
       'enrollee-registration.html': params.get('surveyId')
         ? [
           { label: 'Dashboard', href: 'index.html' },
-          { label: 'Surveys', href: 'surveys.html' },
+          { label: 'Survey Completed', href: 'surveys.html' },
           { label: 'Register Enrollee' }
         ]
         : params.get('enrolleeId')
           ? [
             { label: 'Dashboard', href: 'index.html' },
-            { label: 'Enrollees', href: 'enrollees.html' },
+            { label: 'Gait and Grip Completed', href: 'enrollees.html' },
             { label: 'Edit Enrollee' }
           ]
           : [
             { label: 'Dashboard', href: 'index.html' },
-            { label: 'Enrollees', href: 'enrollees.html' },
+            { label: 'Gait and Grip Completed', href: 'enrollees.html' },
             { label: 'Register Enrollee' }
           ],
       'data-export.html': [
@@ -895,7 +899,7 @@
     }
 
     if(isNewEnrolleeRegistrationHref(href) && isViewerRole()){
-      return 'Your role does not allow registering a new patient.';
+      return 'Your role does not allow starting a new grip and gait.';
     }
 
     if(link && link.dataset && link.dataset.loginAlert){
@@ -915,7 +919,7 @@
     }
 
     if(isNewEnrolleeRegistrationPage()){
-      window.alert('Your role does not allow registering a new patient.');
+      window.alert('Your role does not allow starting a new grip and gait.');
       window.location.href = 'index.html';
     }
   }

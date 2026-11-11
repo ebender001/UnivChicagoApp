@@ -344,7 +344,7 @@
           showCompletionOverlay({
             title: 'Registration and survey complete',
             message: 'BeFitMe Enrollee Registration and BeFitMe Survey are both complete.',
-            redirectUrl: 'enrollees.html'
+            redirectUrl: 'frailty-screenings.html'
           });
           return;
         }

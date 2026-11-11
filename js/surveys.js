@@ -38,13 +38,8 @@
     return cell;
   }
 
-  function getSurveyEnrolleeNumber(survey){
-    if(!survey || !survey.enrollee) return 'Not linked';
-
-    if(survey.enrollee.enrolleeNumber) return survey.enrollee.enrolleeNumber;
-    if(survey.enrollee.fields && survey.enrollee.fields.enrolleeNumber) return survey.enrollee.fields.enrolleeNumber;
-
-    return 'Not linked';
+  function getGaitGripStatus(survey){
+    return survey && survey.enrollee ? 'Completed' : 'Not yet';
   }
 
   function createActionCell(survey){
@@ -128,7 +123,7 @@
       var row = document.createElement('tr');
       row.appendChild(createCell(formatDateTime(survey.createdAt)));
       row.appendChild(createCell(survey.objectId));
-      row.appendChild(createCell(getSurveyEnrolleeNumber(survey)));
+      row.appendChild(createCell(getGaitGripStatus(survey)));
       body.appendChild(row);
     });
 

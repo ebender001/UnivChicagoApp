@@ -17,13 +17,22 @@ Tips:
 
 ## 2. Navigating the dashboard
 
-After logging in, the dashboard provides access to:
-- Surveys
-- Enrollees
+The dashboard is titled Frailty Screening Dashboard. After logging in, it provides access to:
+- Survey Completed (surveys that still need grip and gait)
+- Gait and Grip Completed (grip and gait records that do not have a survey yet)
+- Survey and Gait and Grip Completed (completed frailty screenings)
 - Data Export
 - Admin
 
 Use the dashboard buttons to open the section you need.
+
+### Start a new grip and gait
+1. On the dashboard, click Start a New Grip and Gait.
+2. The grip test and gait test questions default to Yes. Change an answer to No if the patient cannot complete that test.
+3. Enter the hand grip values and record the gait speed, using the timer or by entering the values manually.
+4. Submit the form.
+
+Records are identified by the date and time they were completed. Enrollee numbers and start and stop dates are no longer used.
 
 ## 3. Managing specialties
 

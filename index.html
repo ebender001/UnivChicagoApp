@@ -3,8 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BeFitMe Dashboard</title>
+    <title>Frailty Screening Dashboard</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -12,23 +16,27 @@
 
     <main id="main-content" class="container">
       <section class="welcome-card card">
-        <h1 class="page-title">BeFitMe Dashboard</h1>
+        <h1 class="page-title">Frailty Screening Dashboard</h1>
         <p class="lead">Use the Survey page to enter participant information. The buttons and form fields are designed to be easy to read and easy to press.</p>
         <p class="dashboard-actions">
           <a class="btn primary" href="survey.html">Start a New Survey</a>
-          <a class="btn primary" href="enrollee-registration.html" data-login-alert="Please log in before registering a new patient.">Register New Patient</a>
+          <a class="btn primary" href="enrollee-registration.html" data-login-alert="Please log in before starting a new grip and gait.">Start a New Grip and Gait</a>
           <button type="button" class="btn" id="show-survey-qr-code">Survey QR Code</button>
         </p>
       </section>
 
       <section class="cards-grid" aria-label="Dashboard cards">
         <a class="card dashboard-card-link" href="surveys.html">
-          <h2>Surveys</h2>
-          <p class="muted">Access the list of surveys that need to complete registration.</p>
+          <h2>Survey Completed</h2>
+          <p class="muted">Access the list of surveys that still need gait and grip to be completed.</p>
         </a>
         <a class="card dashboard-card-link" href="enrollees.html">
-          <h2>Enrollees</h2>
-          <p class="muted">Access the list of recent enrollees.</p>
+          <h2>Gait and Grip Completed</h2>
+          <p class="muted">Access the list of gait and grip records that do not have a survey yet.</p>
+        </a>
+        <a class="card dashboard-card-link" href="frailty-screenings.html">
+          <h2>Survey and Gait and Grip Completed</h2>
+          <p class="muted">Access the list of completed frailty screenings.</p>
         </a>
         <a class="card dashboard-card-link" href="data-export.html">
           <h2>Data Export</h2>

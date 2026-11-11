@@ -658,10 +658,9 @@
   function renderSummaryText(container, enrollee, survey){
     if(!container || !enrollee) return;
 
-    var enrolleeNumber = (enrollee.fields && enrollee.fields.enrolleeNumber) || enrollee.enrolleeNumber || enrollee.objectId;
     container.innerHTML = [
-      '<p><strong>Enrollee Registration #' + enrolleeNumber + '</strong></p>',
-      '<p>Enrolled - ' + (enrollee.createdAt ? new Date(enrollee.createdAt).toLocaleString() : 'Not Available') + '</p>',
+      '<p><strong>Gait and Grip Completed</strong></p>',
+      '<p>Gait and Grip - ' + (enrollee.createdAt ? new Date(enrollee.createdAt).toLocaleString() : 'Not Available') + '</p>',
       '<p>Frailty Assessment - ' + (survey && survey.createdAt ? new Date(survey.createdAt).toLocaleString() : 'Not Available') + '</p>'
     ].join('');
   }

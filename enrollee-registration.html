@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>BeFitMe Enrollee Registration</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body class="registration-page">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -13,37 +17,17 @@
     <main id="main-content" class="container">
       <section class="card">
         <h1 class="page-title">BeFitMe Enrollee Registration</h1>
-        <p class="lead">Enter an enrollee number or generate one automatically.</p>
+        <p class="lead">Enter the grip and gait results below.</p>
 
         <form class="survey-form">
-          <div class="form-row">
-            <label for="enrollee-number">Enrollee Number</label>
-            <div class="input-action-row">
-              <input type="text" id="enrollee-number" name="enrolleeNumber" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="Enrollee Number" required />
-              <button type="button" id="generate-enrollee-number" class="btn primary">Generate</button>
-            </div>
-            <p class="field-note">After generating a number, don't forget to register the MRN on Red Cap</p>
-          </div>
-
-          <div class="date-field-row">
-            <div class="form-row">
-              <label for="start-date">Start Date</label>
-              <input type="date" id="start-date" name="startDate" required />
-            </div>
-            <div class="form-row">
-              <label for="stop-date">Stop Date</label>
-              <input type="date" id="stop-date" name="stopDate" required />
-            </div>
-          </div>
-
           <fieldset class="form-row compact-choice-group">
             <legend>Is patient able to complete the grip test?</legend>
             <label class="choice" for="grip-test-yes">
-              <input type="radio" id="grip-test-yes" name="canCompleteGripTest" value="Yes" required />
+              <input type="radio" id="grip-test-yes" name="canCompleteGripTest" value="Yes" checked required />
               <span>Yes</span>
             </label>
             <label class="choice" for="grip-test-no">
-              <input type="radio" id="grip-test-no" name="canCompleteGripTest" value="No" checked />
+              <input type="radio" id="grip-test-no" name="canCompleteGripTest" value="No" />
               <span>No</span>
             </label>
           </fieldset>
@@ -90,11 +74,11 @@
           <fieldset class="form-row compact-choice-group">
             <legend>Is patient able to complete the gait test?</legend>
             <label class="choice" for="gait-test-yes">
-              <input type="radio" id="gait-test-yes" name="canCompleteGaitTest" value="Yes" required />
+              <input type="radio" id="gait-test-yes" name="canCompleteGaitTest" value="Yes" checked required />
               <span>Yes</span>
             </label>
             <label class="choice" for="gait-test-no">
-              <input type="radio" id="gait-test-no" name="canCompleteGaitTest" value="No" checked />
+              <input type="radio" id="gait-test-no" name="canCompleteGaitTest" value="No" />
               <span>No</span>
             </label>
           </fieldset>

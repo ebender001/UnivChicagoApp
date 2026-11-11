@@ -20,7 +20,7 @@
     if(!detailRenderer) return;
 
     if(subtitle && enrollee){
-      subtitle.textContent = 'Enrollee ' + ((enrollee.fields && enrollee.fields.enrolleeNumber) || enrollee.objectId);
+      subtitle.textContent = enrollee.createdAt ? 'Completed ' + new Date(enrollee.createdAt).toLocaleString() : 'Gait and Grip';
     }
 
     if(frailty) frailty.hidden = false;

@@ -3,17 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BeFitMe Enrollees</title>
+    <title>BeFitMe Gait and Grip Completed</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <div data-site-header></div>
 
-    <main id="main-content" class="container">
+    <main id="main-content" class="container" data-survey-linked="false">
       <section class="card">
-        <h1 class="page-title">Enrollees</h1>
-        <p class="lead">Recent enrollee registrations are listed below.</p>
+        <h1 class="page-title">Gait and Grip Completed</h1>
+        <p class="lead">Gait and grip records that do not yet have a survey are listed below.</p>
 
         <div id="enrollees-status" class="muted" role="status" aria-live="polite">Loading enrollees...</div>
 
@@ -21,10 +25,7 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th scope="col">Enrollee Number</th>
-                <th scope="col">Enroll Date</th>
-                <th scope="col">Start Date</th>
-                <th scope="col">Stop Date</th>
+                <th scope="col">Date and Time Completed</th>
                 <th scope="col">Survey</th>
                 <th scope="col">Edit</th>
               </tr>

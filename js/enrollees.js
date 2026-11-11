@@ -6,13 +6,23 @@
   var lastTrigger = null;
   var activeSummaryEnrolleeId = null;
 
-  function formatDate(value){
+  function formatDateTime(value){
     if(!value) return '';
 
     var date = new Date(value);
     if(Number.isNaN(date.getTime())) return '';
 
-    return date.toLocaleDateString();
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  }
+
+  function enrolleeLabel(enrollee){
+    return formatDateTime(enrollee.createdAt) || enrollee.objectId;
   }
 
   function setStatus(message){
@@ -154,7 +164,7 @@
       // Linked enrollees show results; unlinked enrollees start a survey with their id in the URL.
       if(enrollee.fields && enrollee.fields.survey && enrollee.fields.survey.objectId){
         button.textContent = 'Survey Results';
-        button.setAttribute('aria-label', 'View survey results for enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+        button.setAttribute('aria-label', 'View survey results for gait and grip completed ' + enrolleeLabel(enrollee));
         button.addEventListener('click', function(event){
           event.stopPropagation();
           window.location.href = 'enrollee-detail.html?enrolleeId=' + encodeURIComponent(enrollee.objectId);
@@ -162,7 +172,7 @@
       }else{
         button.textContent = 'Start Survey';
         button.classList.add('start-survey-button');
-        button.setAttribute('aria-label', 'Start survey for enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+        button.setAttribute('aria-label', 'Start survey for gait and grip completed ' + enrolleeLabel(enrollee));
         button.addEventListener('click', function(event){
           event.stopPropagation();
           window.location.href = 'survey.html?enrolleeId=' + encodeURIComponent(enrollee.objectId);
@@ -170,7 +180,7 @@
       }
     }else{
       button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"></path><path d="m14 7 3 3"></path></svg>';
-      button.setAttribute('aria-label', 'Edit enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+      button.setAttribute('aria-label', 'Edit gait and grip completed ' + enrolleeLabel(enrollee));
       button.addEventListener('click', function(event){
         event.stopPropagation();
         window.location.href = 'enrollee-registration.html?enrolleeId=' + encodeURIComponent(enrollee.objectId);
@@ -193,7 +203,7 @@
       row.className = 'clickable-enrollee-row';
       row.tabIndex = 0;
       row.setAttribute('role', 'button');
-      row.setAttribute('aria-label', 'Open enrollee summary for enrollee ' + (enrollee.enrolleeNumber || enrollee.objectId));
+      row.setAttribute('aria-label', 'Open summary for gait and grip completed ' + enrolleeLabel(enrollee));
       row.addEventListener('click', function(){
         openSummaryOverlay(enrollee, row);
       });
@@ -203,7 +213,7 @@
           openSummaryOverlay(enrollee, row);
         }
       });
-      row.appendChild(createCell(enrollee.enrolleeNumber || enrollee.objectId));
+      row.appendChild(createCellenrolleeLabel(enrollee));
       row.appendChild(createCell(formatDate(enrollee.createdAt)));
       row.appendChild(createCell(formatDate(enrollee.startDate)));
       row.appendChild(createCell(formatDate(enrollee.stopDate)));
@@ -221,13 +231,17 @@
       return;
     }
 
-    window.BeFitMeAuth.runCloudFunction('listEnrollees', {
-      limit: 100
-    }).then(function(response){
+    var main = document.getElementById('main-content');
+    var linked = main ? main.getAttribute('data-survey-linked') : null;
+    var params = { limit: 100 };
+    if(linked === 'true') params.surveyLinked = true;
+    if(linked === 'false') params.surveyLinked = false;
+
+    window.BeFitMeAuth.runCloudFunction('listEnrollees', params).then(function(response){
       var enrollees = response && response.results ? response.results : [];
 
       if(!enrollees.length){
-        setStatus('No enrollees found.');
+        setStatus(linked === 'true' ? 'No completed frailty screenings found.' : 'No gait and grip records found.');
         return;
       }
 
