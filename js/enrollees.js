@@ -213,10 +213,7 @@
           openSummaryOverlay(enrollee, row);
         }
       });
-      row.appendChild(createCellenrolleeLabel(enrollee));
-      row.appendChild(createCell(formatDate(enrollee.createdAt)));
-      row.appendChild(createCell(formatDate(enrollee.startDate)));
-      row.appendChild(createCell(formatDate(enrollee.stopDate)));
+      row.appendChild(createCell(formatDateTime(enrollee.createdAt)));
       row.appendChild(createActionCell('survey', enrollee));
       row.appendChild(createActionCell('edit', enrollee));
       body.appendChild(row);
