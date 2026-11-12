@@ -343,7 +343,7 @@
         if(hasLinkedEnrollee(result, payload)){
           showCompletionOverlay({
             title: 'Registration and survey complete',
-            message: 'BeFitMe Enrollee Registration and BeFitMe Survey are both complete.',
+            message: 'BeFitMe Gait and Grip and BeFitMe Survey are both complete.',
             redirectUrl: 'frailty-screenings.html'
           });
           return;
