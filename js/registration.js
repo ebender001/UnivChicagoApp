@@ -680,7 +680,7 @@
           hideRegistrationStatus();
           if(hasCompletedBoth){
             showRegistrationCompletionOverlay({
-              title: 'Registration and survey complete',
+              title: 'Gait and Grip and survey complete',
               message: 'BeFitMe Gait and Grip and BeFitMe Survey are both complete.',
               redirectUrl: 'frailty-screenings.html'
             });
