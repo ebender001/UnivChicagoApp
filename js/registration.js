@@ -573,7 +573,7 @@
     var lead = document.querySelector('.registration-page .lead');
     var submit = document.querySelector('.registration-page form [type="submit"]');
 
-    if(title) title.textContent = 'Edit Enrollee Registration';
+    if(title) title.textContent = 'Edit BeFitMe Gait and Grip';
     if(lead) lead.textContent = 'Update the enrollee registration details below.';
     if(submit) submit.textContent = 'Update';
 
